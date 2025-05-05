@@ -711,4 +711,4 @@ Below are some of the key dependencies used in the backend:
 
 ## ⚙️ Installation and Setup
 
-Refer to the [Installation and Setup](#-installation-and-setup) section for detailed instructions on how to set up and run the backend.
+Refer to the [Installation and Setup](#installation-and-setup) section for detailed instructions on how to set up and run the backend.
