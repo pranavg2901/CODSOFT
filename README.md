@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://your-logo-url.com/logo.png" alt="Project Logo" width="100"/>
+  <img src="https://dmfu.in/images/DMFU.png" alt="Project Logo" width="100"/>
 </p>
 
 <h1 align="center">Your Project Name</h1>
