@@ -599,7 +599,7 @@ Meta tags are included in the `metatags.html` component to improve the website's
 
 This documentation covers all aspects of the website's frontend, ensuring developers and designers have a clear understanding of its structure and functionality.
 
-## 🛠 Backend Documentation
+# 🛠 Backend Documentation
 
 The **Super Star Pest Control Services** backend is built on Django, providing robust functionality for service management, booking systems, and administrative tasks. This document outlines the main libraries, environment configuration, dependencies, backend features, and installation steps.
 
