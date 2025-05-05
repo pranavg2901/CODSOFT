@@ -34,4 +34,13 @@
 
 The platform provides an easy-to-use **booking system** for pest control services offered by **Super Star Pest Control Services Pvt. Ltd**.
 
+## 🎯 Purpose
+
+The primary goal of the **Super Star Pest Control Services** project is to provide an easy and efficient way for customers to book pest control services online. This platform enables seamless interaction between the customers and the company, **Super Star Pest Control Services Pvt. Ltd.**
+
+### Key Objectives:
+- **User Convenience**: Allow customers to book pest control services from anywhere, anytime, using an intuitive web interface.
+- **Efficient Management**: Provide an **Admin Panel** for the company to manage customer requests, service bookings, and track job progress.
+- **Service Transparency**: Ensure customers receive clear and detailed information about the available services, making it easy to choose the best solution for their needs.
+
 
