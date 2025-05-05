@@ -599,14 +599,13 @@ Meta tags are included in the `metatags.html` component to improve the website's
 
 This documentation covers all aspects of the website's frontend, ensuring developers and designers have a clear understanding of its structure and functionality.
 
-
 ## 🛠 Backend Documentation
 
 The **Super Star Pest Control Services** backend is built on Django, providing robust functionality for service management, booking systems, and administrative tasks. This document outlines the main libraries, environment configuration, dependencies, backend features, and installation steps.
 
 ---
 
-### ⚡ Backend Overview
+## ⚡ Backend Overview
 
 The backend is responsible for the following functionalities:
 - **Database Management**: Handles all user, service, booking, and company data using MySQL.
@@ -619,7 +618,7 @@ The backend is responsible for the following functionalities:
 
 ---
 
-### **Environment Configuration**
+## 🌍 Environment Configuration
 
 Below is an example `.env` file used for configuring the backend environment:
 
@@ -650,7 +649,7 @@ EMAIL_HOST_PASSWORD=
 
 ---
 
-### **Main Libraries**
+## 📚 Main Libraries
 
 Below are the primary libraries and frameworks used in the backend:
 
@@ -665,35 +664,35 @@ Below are the primary libraries and frameworks used in the backend:
 
 ---
 
-### **Backend Features**
+## 🚀 Backend Features
 
-1. **Database Management**
-   - Uses **MySQL** database with Django ORM for efficient data handling.
-   - Manages user accounts, bookings, services, and payment details.
+### **1. Database Management**
+- Uses **MySQL** database with Django ORM for efficient data handling.
+- Manages user accounts, bookings, services, and payment details.
 
-2. **API Development**
-   - Provides RESTful endpoints for frontend integration.
-   - Handles user authentication, service fetching, bookings, and payments.
+### **2. API Development**
+- Provides RESTful endpoints for frontend integration.
+- Handles user authentication, service fetching, bookings, and payments.
 
-3. **Task Scheduling**
-   - Background tasks like email notifications, SMS updates, and job assignments are managed using Celery and Redis.
+### **3. Task Scheduling**
+- Background tasks like email notifications, SMS updates, and job assignments are managed using Celery and Redis.
 
-4. **Payment Processing**
-   - Secure and seamless payment integration with RazorPay.
+### **4. Payment Processing**
+- Secure and seamless payment integration with RazorPay.
 
-5. **Notifications**
-   - Sends booking confirmations and updates via email (SMTP) and SMS (Twilio).
+### **5. Notifications**
+- Sends booking confirmations and updates via email (SMTP) and SMS (Twilio).
 
-6. **Google Maps Integration**
-   - Enables location-based features such as mapping addresses and calculating distances.
+### **6. Google Maps Integration**
+- Enables location-based features such as mapping addresses and calculating distances.
 
-7. **Security**
-   - Implements JWT Authentication for secure API access.
-   - Protects sensitive data using environment variables.
+### **7. Security**
+- Implements JWT Authentication for secure API access.
+- Protects sensitive data using environment variables.
 
 ---
 
-### **Dependencies**
+## 📦 Dependencies
 
 Below are some of the key dependencies used in the backend:
 
@@ -710,6 +709,6 @@ Below are some of the key dependencies used in the backend:
 
 ---
 
-### ⚙️ Installation and Setup
+## ⚙️ Installation and Setup
 
 Refer to the [Installation and Setup](#-installation-and-setup) section for detailed instructions on how to set up and run the backend.
