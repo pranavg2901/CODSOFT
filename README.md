@@ -72,3 +72,12 @@ The primary goal of the **Super Star Pest Control Services** project is to provi
 
 This system provides a seamless experience for both users and company managers, making pest control services more accessible and manageable.
 
+
+## 🔗 Links
+
+Here are the important links for accessing the **Super Star Pest Control Services** platform:
+
+- **[Main Website](https://www.superstarpestcontrol.com/)**: Access the website where users can browse services, book slots, and make payments.
+- **[Admin Panel](https://admin.superstarpestcontrol.com/)**: The dedicated admin panel where company managers and admins can manage bookings, assign employees, and track job progress.
+- **[Django Default Admin Panel](https://superstarpestcontrol.com/supreme/)**: Access the Django default admin panel for advanced administrative controls (if necessary).
+
