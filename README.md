@@ -159,8 +159,7 @@ The **Super Star Pest Control Services** project utilizes a variety of modern te
 
 7. **Real-Time Updates**:
    - The admin panel is designed to provide real-time updates on bookings, payments, and task assignments. This helps the company stay responsive and efficient in managing daily operations.
-
----
+   
 
 ### **Integrated Technologies in Features**:
 
@@ -168,8 +167,6 @@ The **Super Star Pest Control Services** project utilizes a variety of modern te
 - **Twilio**: SMS notifications for customer and employee updates.
 - **Google Maps**: Integration to track and send the customer's location to the assigned employee for better navigation.
 
-
----
 
 ## ⚙️ Installation and Setup
 
