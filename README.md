@@ -282,3 +282,104 @@ To deploy and run the **Super Star Pest Control Services** website on a server, 
 
 --- 
 
+
+## 🗂 Project Structure
+
+The **Super Star Pest Control Services** project is organized into a structured hierarchy of directories and files to ensure clarity and ease of navigation. Below is the detailed breakdown of the project structure:
+
+### **Root Directory: `website`**
+- `.gitignore`: Git ignore file for managing untracked files.
+- `backend/`: Contains the core backend logic, including Django apps.
+- `requirements.txt`: Python dependencies required for the project.
+- `venv/`: Python virtual environment folder.
+
+---
+
+### **Backend Directory: `website/backend`**
+- `.env`: Environment variables file for sensitive data.
+- `.env.example`: Example file for environment variables.
+- `.gitignore`: Git ignore file specific to the backend.
+- `manage.py`: Django's command-line utility for administrative tasks.
+- `api/`: Contains the main API logic for the project.
+- `backend/`: Core Django backend configuration files.
+- `frontend/`: Handles templates, static files, and frontend logic.
+- `media/`: Directory for storing uploaded files.
+
+---
+
+### **API Directory: `website/backend/api`**
+- `admin.py`: Configuration for the admin interface.
+- `apps.py`: Application configuration for the API app.
+- `migrations/`: Contains database migration files.
+- `models.py`: Django models defining the database schema.
+- `serializers.py`: Serializers for converting data between Python objects and JSON.
+- `tasks.py`: Celery tasks for background processing.
+- `tests.py`: Unit tests for the API app.
+- `urls.py`: URL routing for the API.
+- `utils.py`: Utility functions used across the API.
+- `views.py`: Django views handling HTTP requests and responses.
+
+---
+
+### **Backend Configuration Directory: `website/backend/backend`**
+- `asgi.py`: ASGI configuration for asynchronous server deployment.
+- `celery.py`: Celery configuration for task queues.
+- `settings.py`: Core Django settings for the project.
+- `urls.py`: URL routing for the backend.
+- `wsgi.py`: WSGI configuration for web server deployment.
+
+---
+
+### **Frontend Directory: `website/backend/frontend`**
+- `admin.py`: Configuration for the frontend admin interface.
+- `apps.py`: Application configuration for the frontend app.
+- `migrations/`: Contains database migration files for the frontend.
+- `models.py`: Models related to frontend functionalities.
+- `static/`: Contains static files (CSS, JS, images, etc.).
+- `templates/`: Contains HTML templates for the frontend.
+- `tests.py`: Unit tests for the frontend app.
+- `urls.py`: URL routing for the frontend.
+- `views.py`: Django views for rendering templates.
+
+---
+
+### **Frontend Templates Directory: `website/backend/frontend/templates`**
+- `404.html`: Custom 404 error page.
+- `about.html`: About Us page.
+- `admin.html`: Template for the admin interface.
+- `base.html`: Base template for consistent layouts.
+- `blog.html`: Blog listing page.
+- `blogs/`: Contains individual blog templates.
+  - `blog01.html`, `blog02.html`, `blog03.html`: Blog content pages.
+- `blog_details.html`: Detailed blog page.
+- `booking_info.html`: Booking information page.
+- `contact.html`: Contact Us page.
+- `faq.html`: Frequently Asked Questions page.
+- `includes/`: Includes reusable components.
+  - `booking_form.html`, `feedback.html`, `footer.html`, `metatags.html`, `navbar.html`, `reviews.html`: Modular components for templates.
+- `index.html`: Home page template.
+- `offer.html`: Offers page.
+- `offer_booking.html`: Offer booking page.
+- `policy.html`: Privacy policy page.
+- `service.html`: Services page.
+- `services/`: Contains templates for individual services.
+  - `anti_fungal_treatment.html`, `anti_termite_control.html`, `bed_bugs_control.html`, etc.
+- `terms_conditions.html`: Terms and Conditions page.
+- `thank_you.html`: Thank You page.
+
+---
+
+### **Frontend Static Directory: `website/backend/frontend/static`**
+- `css/`: Stylesheets for the project.
+  - `about.css`, `blog.css`, `contact.css`, `index.css`, `offer.css`, `services.css`, `style.css`
+- `images/`: Images used throughout the project.
+- `js/`: JavaScript files for frontend interactivity.
+  - `about.js`, `contact.js`, `feedback.js`, `index.js`, `reviews.js`, `service.js`, `script.js`
+- `json/`: JSON files for data representation.
+- `videos/`: Videos displayed on the website.
+
+---
+
+This structure ensures the separation of concerns, making the project maintainable and scalable.
+
+
