@@ -193,7 +193,7 @@ To run the **Super Star Pest Control Services** project, you can set it up eithe
    ```
    The prompt should look like this:
    ```
-   (venv) C:\Users\PRANAV\OneDrive\Documents\GitHub\BSS02\website>
+   (venv) C:\GitHub\BSS02\website>
    ```
 
 4. Install the required dependencies:
