@@ -231,7 +231,54 @@ To run the **Super Star Pest Control Services** project, you can set it up eithe
    npm start
    ```
 
----
-
 ### Running on a Server
+
+To deploy and run the **Super Star Pest Control Services** website on a server, follow these steps:
+
+1. Navigate to the project directory on the server:
+   ```bash
+   cd /path/to/project/BSS02
+   ```
+
+2. Go to the `website` folder:
+   ```bash
+   cd website
+   ```
+
+3. Activate the Python virtual environment:
+   ```bash
+   source venv/bin/activate
+   ```
+
+4. Install the required dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. Navigate to the folder containing the `manage.py` file (backend):
+   ```bash
+   cd /path/to/project/BSS02/website
+   ```
+
+6. Apply database migrations:
+   ```bash
+   python manage.py makemigrations api
+   python manage.py makemigrations
+   python manage.py migrate
+   ```
+
+7. Collect static files:
+   ```bash
+   python manage.py collectstatic
+   ```
+
+8. Start the Django server:
+   ```bash
+   python manage.py runserver 0.0.0.0:8000
+   ```
+   - Replace `8000` with any unused port on your server if needed.
+
+> **Note**: The React admin panel cannot be run directly on the server using this method. For deploying the React admin panel, refer to the **Deployment** section.
+
+--- 
 
