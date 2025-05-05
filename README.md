@@ -383,3 +383,65 @@ The **Super Star Pest Control Services** project is organized into a structured 
 This structure ensures the separation of concerns, making the project maintainable and scalable.
 
 
+## 🚀 Usage
+
+The **Super Star Pest Control Services** project is designed for both users and administrators. Below are the usage instructions for each type of user:
+
+---
+
+### **For Users (Website)**
+
+1. **Browse Services**  
+   Visit the website and explore the catalog of pest control services. Each service provides details such as benefits, frequency, and pricing.
+
+2. **Book a Slot**  
+   Select a service and choose a convenient time slot for the booking.
+
+3. **Make Payments**  
+   Complete your booking by making payments through the integrated payment gateway.
+
+4. **View Offers**  
+   Check for ongoing offers and discounts directly on the homepage.
+
+5. **Customer Support**  
+   Use the contact page or FAQs section for any queries or assistance.
+
+---
+
+### **For Administrators (Admin Panel)**
+
+1. **Login**  
+   Access the admin panel using your credentials.
+
+2. **Manage Bookings**  
+   View, edit, and assign employees to customer bookings.
+
+3. **Send Notifications**  
+   Automatically send SMS notifications to customers and employees upon booking assignments.
+
+4. **Track Services**  
+   Monitor the progress of ongoing services and ensure timely completion.
+
+5. **Service Configuration**  
+   Update service details, pricing, and offers as per business requirements.
+
+---
+
+### **For Developers**
+
+1. **Setup the Project**  
+   Follow the [Installation and Setup](#-installation-and-setup) instructions to run the project locally or on a server.
+
+2. **Understand the Codebase**  
+   Refer to the [Project Structure](#-project-structure) section for a detailed breakdown of the codebase.
+
+3. **Extend Functionality**  
+   - Add new features by creating new Django apps under the `backend/` directory.
+   - Enhance the frontend by updating templates in the `frontend/templates/` directory or static assets in the `frontend/static/` directory.
+
+4. **Debugging and Testing**  
+   Use the provided `tests.py` files in both `api` and `frontend` directories to write and run tests for debugging and validation.
+
+
+This project provides a seamless experience for all stakeholders—users, administrators, and developers. Ensure to follow the documentation for proper usage and maintenance.
+
