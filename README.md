@@ -10,11 +10,34 @@
 
 <h3 align="center"><em>Comprehensive Documentation for Developers</em></h3>
 
-|--------------------------|-----------------------------------------------------------|
-| **Project Name**         | Super Star Pest Control Services                         |
-| **Developed By**         | Beginning Solutions                                      |
-| **Client Name**          | Sanjay Gavhane                                           |
-| **Client Company Name**  | Super Star Pest Control Services Pvt. Ltd                |
-| **Created At**           | April 2024                                               |
-| **Last Updated**         | May 5, 2025                                              |
+<table width="100%">
+  <tr>
+    <th align="left">Key</th>
+    <th align="left">Value</th>
+  </tr>
+  <tr>
+    <td><strong>Project Name</strong></td>
+    <td>Super Star Pest Control Services</td>
+  </tr>
+  <tr>
+    <td><strong>Developed By</strong></td>
+    <td>Beginning Solutions</td>
+  </tr>
+  <tr>
+    <td><strong>Client Name</strong></td>
+    <td>Sanjay Gavhane</td>
+  </tr>
+  <tr>
+    <td><strong>Client Company Name</strong></td>
+    <td>Super Star Pest Control Services Pvt. Ltd</td>
+  </tr>
+  <tr>
+    <td><strong>Created At</strong></td>
+    <td>April 2024</td>
+  </tr>
+  <tr>
+    <td><strong>Last Updated</strong></td>
+    <td>May 5, 2025</td>
+  </tr>
+</table>
 
