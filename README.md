@@ -8,4 +8,14 @@
 
 <h1 align="center" style="font-size: 36px;"><strong>Super Star Pest Control Services</strong></h1>
 
-<h3 align="center"><em>Documentation for Developers</em></h3>
+<h3 align="center"><em>Comprehensive Documentation for Developers</em></h3>
+
+| Key                     | Value                                                   |
+|--------------------------|-----------------------------------------------------------|
+| **Project Name**         | Super Star Pest Control Services                         |
+| **Developed By**         | Beginning Solutions                                      |
+| **Client Name**          | Sanjay Gavhane                                           |
+| **Client Company Name**  | Super Star Pest Control Services Pvt. Ltd                |
+| **Created At**           | April 2024                                               |
+| **Last Updated**         | May 5, 2025                                              |
+
