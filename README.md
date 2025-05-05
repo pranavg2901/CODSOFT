@@ -445,3 +445,271 @@ The **Super Star Pest Control Services** project is designed for both users and 
 
 This project provides a seamless experience for all stakeholders—users, administrators, and developers. Ensure to follow the documentation for proper usage and maintenance.
 
+
+# 🌐 Website Frontend Documentation
+
+This document provides a comprehensive guide to the **frontend** portion of the website for **Super Star Pest Control Services**. It includes a breakdown of the file structure, templates, static assets, and key components that power the user-facing side of the project.
+
+---
+
+## 🗂 Frontend Structure Overview
+
+The frontend is designed using Django templates and static files such as CSS, JavaScript, images, and videos. Below is the organized structure of the frontend directory:
+
+### **Frontend Directory: `website/backend/frontend`**
+- **`admin.py`**: Admin configuration for the frontend app.
+- **`apps.py`**: Application configuration for the frontend.
+- **`migrations/`**: Contains migration files for database changes related to frontend functionalities.
+- **`models.py`**: Models associated with the frontend (if any).
+- **`static/`**: Contains all static assets (CSS, JavaScript, images, videos, etc.).
+- **`templates/`**: Contains HTML templates for the frontend.
+- **`tests.py`**: Unit tests for the frontend.
+- **`urls.py`**: URL routing for the frontend.
+- **`views.py`**: Views responsible for rendering templates and handling frontend logic.
+
+---
+
+## 🖼 Templates Directory: `frontend/templates`
+
+The `templates/` directory contains HTML files organized for various pages and reusable components. 
+
+### Key Templates:
+- **`404.html`**: Custom 404 error page.
+- **`about.html`**: Displays information about the company.
+- **`admin.html`**: Admin-specific frontend interface.
+- **`base.html`**: Base template for consistent layout across pages.
+- **`blog.html`**: Blog listing page.
+- **`blog_details.html`**: Detailed view of a single blog post.
+- **`booking_info.html`**: Displays booking-related information for users.
+- **`contact.html`**: Contact form and company details.
+- **`faq.html`**: Frequently Asked Questions page.
+- **`index.html`**: Homepage with a dynamic service and offer display.
+- **`offer.html`**: Displays current offers.
+- **`offer_booking.html`**: Enables users to book services with offers.
+- **`policy.html`**: Privacy policy page.
+- **`service.html`**: Showcases available pest control services.
+- **`terms_conditions.html`**: Terms and conditions page.
+- **`thank_you.html`**: Thank you page displayed after successful actions.
+
+### Subdirectories:
+1. **`blogs/`**: Contains individual blog templates:
+   - `blog01.html`, `blog02.html`, `blog03.html`, etc.
+
+2. **`services/`**: Contains templates for specific services:
+   - `anti_fungal_treatment.html`
+   - `anti_termite_control.html`
+   - `bed_bugs_control.html`
+   - `cockroach_control.html`
+   - `rodent_control.html`
+   - And more (total: 13 service templates).
+
+3. **`includes/`**: Reusable components for modular design:
+   - `booking_form.html`: Form for booking services.
+   - `feedback.html`: Displays user feedback.
+   - `footer.html`: Footer section for all pages.
+   - `metatags.html`: Meta tags for SEO optimization.
+   - `navbar.html`: Navigation bar for the website.
+   - `reviews.html`: Section displaying customer reviews.
+
+---
+
+## 🎨 Static Files: `frontend/static`
+
+The `static/` directory contains all the assets required for styling, scripts, and media.
+
+### Subdirectories:
+1. **`css/`**: Stylesheets for the website.
+   - `about.css`: Styles for the About Us page.
+   - `blog.css`: Styles for blog pages.
+   - `contact.css`: Styles for the Contact Us page.
+   - `index.css`: Styles for the homepage.
+   - `offer.css`: Styles for the offers page.
+   - `services.css`: Styles for the services page.
+   - `style.css`: General styles used across the website.
+
+2. **`js/`**: JavaScript files for interactivity.
+   - `about.js`: Scripts for the About Us page.
+   - `contact.js`: Scripts for the Contact Us page.
+   - `feedback.js`: Scripts for feedback forms.
+   - `index.js`: Homepage scripts.
+   - `reviews.js`: Scripts for managing customer reviews.
+   - `service.js`: Scripts for the services page.
+   - `script.js`: General-purpose scripts.
+
+3. **`images/`**: Contains all the images used in the project.
+
+4. **`videos/`**: Contains video files displayed on the website.
+
+5. **`json/`**: JSON files for data representation (if any).
+
+---
+
+## 🔑 Key Features
+
+### **1. Responsive Design**
+The frontend is built with responsiveness in mind, ensuring a seamless user experience across devices (desktop, tablet, mobile).
+
+### **2. Modular Templates**
+Templates are designed with reusability and modularity. Components like the navbar, footer, and booking form are included where needed, reducing redundancy.
+
+### **3. Dynamic Content**
+Pages like `index.html`, `service.html`, and `offer.html` dynamically display content fetched from the backend, ensuring up-to-date information for users.
+
+### **4. Consistent Styling**
+All pages share a consistent look and feel, achieved through the use of the `base.html` template and shared CSS files.
+
+### **5. SEO Optimized**
+Meta tags are included in the `metatags.html` component to improve the website's visibility in search engines.
+
+---
+
+## 🛠 Development Workflow
+
+1. **Modifying Templates**
+   - Templates can be updated in the `frontend/templates/` directory.
+   - Use the `includes/` directory for reusable components.
+
+2. **Adding New Styles**
+   - Add or modify CSS files in the `frontend/static/css/` directory.
+   - Link the new styles in the corresponding template using `{% static %}` tags.
+
+3. **Enhancing Interactivity**
+   - Add JavaScript files in the `frontend/static/js/` directory.
+   - Link the scripts in the corresponding template using `{% static %}` tags.
+
+4. **Updating Media**
+   - Add images to the `frontend/static/images/` directory.
+   - Add videos to the `frontend/static/videos/` directory.
+   - Reference media in templates using `{% static %}` tags.
+
+---
+
+## 👨‍💻 For Developers
+
+- **Navigation Across Templates**:  
+  Use the `urls.py` file in the `frontend/` directory to define new routes for templates.
+
+- **Testing Changes Locally**:  
+  Run the Django development server and navigate through the website to verify changes.
+
+- **Debugging Issues**:  
+  Use the browser's developer tools to inspect elements, monitor network requests, and debug JavaScript.
+
+---
+
+This documentation covers all aspects of the website's frontend, ensuring developers and designers have a clear understanding of its structure and functionality.
+
+
+## 🛠 Backend Documentation
+
+The **Super Star Pest Control Services** backend is built on Django, providing robust functionality for service management, booking systems, and administrative tasks. This document outlines the main libraries, environment configuration, dependencies, backend features, and installation steps.
+
+---
+
+### ⚡ Backend Overview
+
+The backend is responsible for the following functionalities:
+- **Database Management**: Handles all user, service, booking, and company data using MySQL.
+- **API Development**: Provides RESTful APIs for frontend integration.
+- **Payment Processing**: Facilitates online payments using RazorPay.
+- **Email Services**: Manages email notifications using SMTP.
+- **Google Maps Integration**: Enables location-based services like address mapping and directions.
+- **Task Scheduling**: Uses Celery for background tasks and periodic jobs.
+- **Authentication**: Implements secure user authentication using JWT.
+
+---
+
+### **Environment Configuration**
+
+Below is an example `.env` file used for configuring the backend environment:
+
+```ini name=.env.example
+# Secret Key Configuration
+SECRET_KEY=
+DEBUG= 
+
+# Database Configuration (MYSQL)
+DB_NAME=
+DB_USER=
+DB_PASSWORD=
+DB_HOST=
+DB_PORT=
+
+# Location Configuration (Google Maps)
+GOOGLE_API_KEY=
+PLACE_ID=
+
+# Payment Gateway Configuration (RazorPay)
+RAZORPAY_KEY_ID=
+RAZORPAY_KEY_SECRET=
+
+# Email Configuration (SMTP)
+EMAIL_HOST_USER=
+EMAIL_HOST_PASSWORD=
+```
+
+---
+
+### **Main Libraries**
+
+Below are the primary libraries and frameworks used in the backend:
+
+- **Django**: The main web framework for building the backend.
+- **Django Rest Framework (DRF)**: For creating RESTful APIs.
+- **Celery**: For managing asynchronous tasks and background jobs.
+- **Redis**: Used as a message broker for Celery.
+- **MySQL**: Database system for storing application data.
+- **RazorPay**: Payment gateway integration for processing payments.
+- **Twilio**: For SMS notifications.
+- **Google Maps API**: Location-based features such as address lookups.
+
+---
+
+### **Backend Features**
+
+1. **Database Management**
+   - Uses **MySQL** database with Django ORM for efficient data handling.
+   - Manages user accounts, bookings, services, and payment details.
+
+2. **API Development**
+   - Provides RESTful endpoints for frontend integration.
+   - Handles user authentication, service fetching, bookings, and payments.
+
+3. **Task Scheduling**
+   - Background tasks like email notifications, SMS updates, and job assignments are managed using Celery and Redis.
+
+4. **Payment Processing**
+   - Secure and seamless payment integration with RazorPay.
+
+5. **Notifications**
+   - Sends booking confirmations and updates via email (SMTP) and SMS (Twilio).
+
+6. **Google Maps Integration**
+   - Enables location-based features such as mapping addresses and calculating distances.
+
+7. **Security**
+   - Implements JWT Authentication for secure API access.
+   - Protects sensitive data using environment variables.
+
+---
+
+### **Dependencies**
+
+Below are some of the key dependencies used in the backend:
+
+- **Django**: Core framework for backend development.
+- **djangorestframework**: For building REST APIs.
+- **celery**: Task queue for asynchronous jobs.
+- **redis**: Message broker for Celery.
+- **mysqlclient**: MySQL database adapter for Python.
+- **razorpay**: Integration for RazorPay payment gateway.
+- **twilio**: SMS notification service.
+- **django-cors-headers**: To handle Cross-Origin Resource Sharing (CORS).
+- **django-celery-beat**: Scheduler for periodic Celery tasks.
+- **python-decouple**: For environment variable management.
+
+---
+
+### ⚙️ Installation and Setup
+
+Refer to the [Installation and Setup](#-installation-and-setup) section for detailed instructions on how to set up and run the backend.
