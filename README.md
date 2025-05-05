@@ -48,7 +48,7 @@ The backend is powered by Django REST Framework, the frontend is built with Reac
 {
   "token": "eyJ0eXAiOiJKV1QiLCJh..."
 }
-
+```
 
 ---
 
