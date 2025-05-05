@@ -10,7 +10,6 @@
 
 <h3 align="center"><em>Comprehensive Documentation for Developers</em></h3>
 
-| Key                     | Value                                                   |
 |--------------------------|-----------------------------------------------------------|
 | **Project Name**         | Super Star Pest Control Services                         |
 | **Developed By**         | Beginning Solutions                                      |
