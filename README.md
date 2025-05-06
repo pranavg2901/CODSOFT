@@ -4841,6 +4841,1225 @@ DELETE /assignments/45/
 - **Notifications**:
   - Notifications are sent to employees and clients upon assignment creation or completion.
 
+### **Website URLs and Views**
+
+#### **Base URL**
+The website can be accessed at:  
+`http://127.0.0.1:8000/`
+
+---
+
+### **1. Static Pages**
+
+| **Path**               | **View**         | **Description**                       |
+|-------------------------|------------------|---------------------------------------|
+| `/`                    | `index`          | Homepage of the website.              |
+| `/about/`              | `about`          | About Us page.                        |
+| `/faq/`                | `faq`            | Frequently Asked Questions.           |
+| `/service/`            | `service`        | Services overview page.               |
+| `/offer/`              | `offer`          | Special offers or discounts page.     |
+| `/offer_form/`         | `offer_form`     | Form to submit offers.                |
+| `/policy/`             | `policy`         | Privacy Policy page.                  |
+| `/terms_conditions/`   | `terms`          | Terms and Conditions page.            |
+| `/contact`             | `ContactView`    | Contact page.                         |
+| `/thank_you/`          | `thank_you`      | Thank You page after successful payment. |
+
+---
+
+### **2. Blog Pages**
+
+| **Path**               | **View**         | **Description**                       |
+|-------------------------|------------------|---------------------------------------|
+| `/blog/`               | `blog`           | Blog listing page.                    |
+| `/blog_details/`       | `blog_details`   | Blog details page for a specific post.|
+
+---
+
+### **3. Services Pages**
+
+| **Path**                             | **View**                     | **Description**                        |
+|--------------------------------------|------------------------------|----------------------------------------|
+| `/rodent_control/`                   | `Rodent_ControlView`         | Rodent Pest Control service page.      |
+| `/bed_bugs_control/`                 | `BedBugs_ControlView`        | Bed Bug Control service page.          |
+| `/general_control/`                  | `General_ControlView`        | General Pest Control service page.     |
+| `/honey_bee_control/`                | `Honey_Bees_ControlView`     | Honey Bee Control service page.        |
+| `/cockroach_control/`                | `Cockroach_ControlView`      | Cockroach Control service page.        |
+| `/thermal_fogging/`                  | `Thermal_FoggingView`        | Thermal Fogging service page.          |
+| `/mosquitoes_control/`               | `Mosquitoes_ControlView`     | Mosquitoes Control service page.       |
+| `/dustmite_control/`                 | `Dustmite_ControlView`       | Dust-Mite Control service page.        |
+| `/anti_fungal_control/`              | `Anti_FungalView`            | Anti Fungal Treatment service page.    |
+| `/anti_termite_control/`             | `Anti_TermiteView`           | Anti Termite Control service page.     |
+| `/flies_control/`                    | `Flies_ConteolView`          | Flies Control service page.            |
+| `/wood_borer_control/`               | `Wood_BorerView`             | Wood Borer Treatment service page.     |
+| `/ticks_control/`                    | `Ticks_ControlView`          | Ticks Control service page.            |
+
+---
+
+### **4. Booking Pages**
+
+| **Path**                             | **View**                     | **Description**                        |
+|--------------------------------------|------------------------------|----------------------------------------|
+| `/booking-info/<uuid:secure_token>/` | `booking_info_view`          | Booking details page using a secure token. |
+
+---
+
+### **5. Google Reviews**
+
+| **Path**             | **View**                | **Description**                                       |
+|-----------------------|-------------------------|-----------------------------------------------------|
+| `/reviews/`          | `fetch_google_reviews`  | Fetch and display real-time reviews from Google Maps API.|
+
+**Backend Workflow for Google Reviews**:
+- **API Endpoint**: Google Maps API `/place/details/json`.
+- **Fields Fetched**: Name, rating, reviews.
+- **Filter Logic**: Only reviews with a rating of 4 or higher are displayed.
+- **Error Handling**:
+  - If the API fails, a JSON error response is returned.
+  - If the request fails due to network issues, a server error response is returned.
+
+---
+
+### **6. Error Handling**
+
+| **Path**               | **View**             | **Description**                              |
+|-------------------------|----------------------|----------------------------------------------|
+| `404`                  | `custom_404`         | Custom 404 error page when a page is not found.|
+
+---
+
+### **Frontend Views**
+
+All service-specific pages dynamically set the service name to provide flexibility in templates. Below is an example structure for a service page view:
+
+```python name=frontend/views.py
+class BedBugs_ControlView(TemplateView):
+    template_name = "services/bed_bugs_control.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["service_name"] = "Bed Bug Control"  # Set dynamically
+        return context
+```
+
+Similar views are defined for other services like `General_ControlView`, `Honey_Bees_ControlView`, etc.
+
+---
+
+### **Frontend Templates**
+
+| **Template Name**                     | **Used By View**                 | **Description**                        |
+|---------------------------------------|----------------------------------|----------------------------------------|
+| `services/bed_bugs_control.html`      | `BedBugs_ControlView`            | Template for Bed Bug Control service.  |
+| `services/general_control.html`       | `General_ControlView`            | Template for General Pest Control.     |
+| `services/honey_bees_control.html`    | `Honey_Bees_ControlView`         | Template for Honey Bee Control.        |
+| `services/cockroach_control.html`     | `Cockroach_ControlView`          | Template for Cockroach Control.        |
+| `services/thermal_fogging.html`       | `Thermal_FoggingView`            | Template for Thermal Fogging service.  |
+| `services/mosquitoes_control.html`    | `Mosquitoes_ControlView`         | Template for Mosquitoes Control.       |
+| `services/dust_mite_control.html`     | `Dustmite_ControlView`           | Template for Dust-Mite Control.        |
+| `services/anti_fungal_treatment.html` | `Anti_FungalView`                | Template for Anti Fungal Treatment.    |
+| `services/anti_termite_control.html`  | `Anti_TermiteView`               | Template for Anti Termite Control.     |
+| `services/flies_control.html`         | `Flies_ConteolView`              | Template for Flies Control.            |
+| `services/wood_borer_treatment.html`  | `Wood_BorerView`                 | Template for Wood Borer Treatment.     |
+| `services/ticks_control.html`         | `Ticks_ControlView`              | Template for Ticks Control.            |
+
+---
+
+### **Example: Fetch Google Reviews**
+
+```python name=views.py
+import requests
+from django.http import JsonResponse
+from django.conf import settings
+
+def fetch_google_reviews(request):
+    # Google API URL
+    url = f"https://maps.googleapis.com/maps/api/place/details/json?place_id={settings.PLACE_ID}&fields=name,rating,reviews&key={settings.GOOGLE_API_KEY}"
+
+    try:
+        response = requests.get(url)
+        data = response.json()
+
+        # Check if API request was successful
+        if data.get("status") == "OK":
+            result = data["result"]
+
+            # Filter reviews with rating >= 4
+            filtered_reviews = [r for r in result.get("reviews", []) if r.get("rating", 0) >= 4]
+            result["reviews"] = filtered_reviews
+
+            return JsonResponse(result)
+        else:
+            return JsonResponse({"error": "Failed to fetch reviews", "details": data}, status=400)
+
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({"error": "Request failed", "details": str(e)}, status=500)
+```
+
+### **404 Error Handler**
+
+```python name=views.py
+def custom_404(request, exception):
+    return render(request, '404.html', status=404)
+handler404 = custom_404
+```
+
+This ensures a graceful fallback for users navigating to non-existent pages.
+
+# 🗄️ Database Documentation
+
+## 🐬 Database Overview
+
+### **Database Technology: MySQL**
+- **Why MySQL?**
+  - **Reliability**: MySQL is known for its high reliability and stability, making it suitable for production environments.
+  - **Performance**: It is optimized for read-heavy operations, which is ideal for applications with frequent data retrieval.
+  - **Scalability**: MySQL supports horizontal and vertical scaling, ensuring it can handle large datasets and high user traffic.
+  - **Ease of Use**: Its simplicity and widespread adoption make it easy to set up, manage, and integrate with Django.
+  - **Cost-Effective**: MySQL is open-source and free to use, reducing operational costs for the project.
+
+### **Configuration in Django**
+The database is configured in the `settings.py` file with the following structure:
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',  # Specifies the MySQL database backend
+        'NAME': config('DB_NAME'),            # Database name
+        'USER': config('DB_USER'),            # Database user
+        'PASSWORD': config('DB_PASSWORD'),    # Database password
+        'HOST': config('DB_HOST'),            # Database host (e.g., localhost or an IP address)
+        'PORT': config('DB_PORT'),            # Database port (default for MySQL: 3306)
+    }
+}
+```
+
+### **Environment Variables**
+Sensitive information like database credentials is stored in environment variables. These are loaded into the project using the `python-decouple` package through the `config()` function. This ensures that sensitive data is not hardcoded in the codebase.
+
+---
+
+## 🔧 Database Models
+
+Below, each model in the application is explained in detail. For every model, the following information is provided:
+- **Model Purpose**: What the model is used for.
+- **Fields**: A table explaining all the model fields, including their types, constraints, and descriptions.
+- **Relationships**: An overview of how the model relates to other models.
+
+---
+
+### 🧑‍💼 CustomUser Model
+
+#### **🛠️ Purpose**
+The `CustomUser` model is a custom implementation of the user authentication system in Django. It replaces the default user model to use a phone number as the unique identifier instead of an email and supports role-based access control.
+
+#### **📜 Fields**
+
+| **Field Name**       | **Type**              | **Constraints**                               | **Description**                               |
+|-----------------------|-----------------------|-----------------------------------------------|-----------------------------------------------|
+| `phone_number`        | `CharField`          | `max_length=15, unique=True`                 | The unique phone number for the user.         |
+| `name`               | `CharField`          | `max_length=255`                             | Full name of the user.                        |
+| `role`               | `CharField`          | `choices=ROLE_CHOICES`                       | The role of the user (e.g., SUPERUSER, ADMIN).|
+| `profile_photo`      | `ImageField`         | `upload_to='uploads/profiles/'`              | Profile photo of the user. Optional.          |
+| `is_active`          | `BooleanField`       | `default=True`                               | Indicates if the user account is active.      |
+| `is_staff`           | `BooleanField`       | `default=False`                              | Indicates if the user has staff privileges.   |
+
+---
+
+#### **🔗 Relationships**
+- **None** (This is a standalone model for user management).
+
+---
+
+#### **🔄 Methods**
+
+1. **`__str__`**:
+   - Returns a string representation of the user in the format: `"{name} ({role})"`.
+
+---
+
+#### **🛡️ Role Choices**
+
+| **Role**         | **Description**                  |
+|-------------------|----------------------------------|
+| `SUPERUSER`       | Full access to the system.       |
+| `ADMIN`           | Administrative privileges.       |
+| `MANAGER`         | Managerial access.               |
+| `EMPLOYEE`        | Access limited to specific tasks.|
+
+---
+
+### 🛠️ CustomUserManager
+
+#### **🛠️ Purpose**
+The `CustomUserManager` is a custom manager for the `CustomUser` model. It overrides the default manager to add methods for creating regular users and superusers.
+
+---
+
+#### **🔄 Methods**
+
+1. **`create_user`**:
+   - Creates and saves a new user with the given `phone_number`, `name`, `role`, and `password`.
+   - Raises an error if `phone_number` is not provided.
+
+2. **`create_superuser`**:
+   - Creates and saves a new superuser with the given `phone_number`, `name`, and `password`.
+   - Automatically assigns the role `SUPERUSER` and sets `is_superuser` and `is_staff` to `True`.
+
+---
+
+#### **📋 Authentication Configuration**
+
+- **Username Field**: `phone_number`
+- **Required Fields**: `name`
+- The `CustomUser` model uses Django's built-in authentication framework while replacing the default user model.
+
+---
+
+#### **⚙️ Usage Examples**
+
+1. **Creating a New User**:
+   ```python
+   from myapp.models import CustomUser
+   
+   user = CustomUser.objects.create_user(
+       phone_number="1234567890",
+       name="John Doe",
+       role="ADMIN",
+       password="securepassword123"
+   )
+   ```
+
+2. **Creating a Superuser**:
+   ```python
+   from myapp.models import CustomUser
+   
+   superuser = CustomUser.objects.create_superuser(
+       phone_number="0987654321",
+       name="Jane Smith",
+       password="supersecurepassword"
+   )
+   ```
+
+3. **Querying Users**:
+   ```python
+   admins = CustomUser.objects.filter(role="ADMIN")
+   print([str(admin) for admin in admins])  # Prints the string representation of admin users
+   ```
+
+---
+
+### 🔑 PasswordResetOTP Model
+
+#### **🛠️ Purpose**
+The `PasswordResetOTP` model is used to manage OTPs (One-Time Passwords) for password reset functionality. It stores temporary OTPs associated with a phone number and tracks their expiration and verification status.
+
+---
+
+#### **📜 Fields**
+
+| **Field Name**       | **Type**              | **Constraints**                               | **Description**                               |
+|-----------------------|-----------------------|-----------------------------------------------|-----------------------------------------------|
+| `phone_number`        | `CharField`          | `max_length=15`                              | The phone number associated with the OTP.     |
+| `otp`                | `CharField`          | `max_length=6`                               | The one-time password sent to the user.       |
+| `created_at`         | `DateTimeField`      | `auto_now_add=True`                          | Timestamp when the OTP was created.           |
+| `is_verified`        | `BooleanField`       | `default=False`                              | Indicates whether the OTP has been verified.  |
+
+---
+
+#### **🔗 Relationships**
+- **None** (This is a standalone model for managing OTPs).
+
+---
+
+#### **🔄 Methods**
+
+1. **`is_expired`**:
+   - **Purpose**: Checks if the OTP has expired.
+   - **Logic**: Compares the current time with the `created_at` timestamp and determines if more than 5 minutes (300 seconds) have passed.
+   - **Usage Example**:
+     ```python
+     otp_instance = PasswordResetOTP.objects.get(phone_number="1234567890")
+     if otp_instance.is_expired():
+         print("OTP is expired.")
+     ```
+
+2. **`__str__`**:
+   - Returns a string representation of the OTP in the format: `"{phone_number} - OTP: {otp}"`.
+
+---
+
+#### **⚙️ Usage Examples**
+
+1. **Create a New OTP**:
+   ```python
+   from myapp.models import PasswordResetOTP
+   import random
+
+   otp = str(random.randint(100000, 999999))  # Generate a 6-digit OTP
+   otp_instance = PasswordResetOTP.objects.create(
+       phone_number="1234567890",
+       otp=otp
+   )
+   print(f"OTP created: {otp_instance}")
+   ```
+
+2. **Verify an OTP**:
+   ```python
+   from myapp.models import PasswordResetOTP
+
+   phone_number = "1234567890"
+   otp = "123456"
+   otp_instance = PasswordResetOTP.objects.filter(phone_number=phone_number, otp=otp).first()
+   
+   if otp_instance and not otp_instance.is_expired():
+       otp_instance.is_verified = True
+       otp_instance.save()
+       print("OTP verified successfully.")
+   else:
+       print("Invalid or expired OTP.")
+   ```
+
+3. **Check Expiration**:
+   ```python
+   otp_instance = PasswordResetOTP.objects.get(phone_number="1234567890")
+   if otp_instance.is_expired():
+       print("OTP has expired.")
+   ```
+
+---
+### 👷 Employee Model
+
+#### **🛠️ Purpose**
+The `Employee` model represents employees in the system. Each employee is tied to a `CustomUser` instance that has the role of `EMPLOYEE`. This model is used to manage employee-specific operations, such as tracking availability for assignments.
+
+---
+
+#### **📜 Fields**
+
+| **Field Name**       | **Type**              | **Constraints**                               | **Description**                               |
+|-----------------------|-----------------------|-----------------------------------------------|-----------------------------------------------|
+| `user`               | `OneToOneField`       | Related to `CustomUser`, `on_delete=CASCADE`  | Links the employee to a single `CustomUser`.  |
+
+---
+
+#### **🔗 Relationships**
+- **`CustomUser`**: One-to-One relationship. Each `Employee` is associated with exactly one `CustomUser` instance, and vice versa. Only users with the role `EMPLOYEE` can be linked.
+
+---
+
+#### **🔄 Methods**
+
+1. **`__str__`**:
+   - Returns the name of the user associated with the employee.
+   - **Example**:
+     ```python
+     employee = Employee.objects.get(id=1)
+     print(str(employee))  # Output: "John Doe"
+     ```
+
+2. **`is_available` (Property)**:
+   - **Purpose**: Checks if the employee is available for a new assignment.
+   - **Logic**:
+     - An employee is considered unavailable if they already have an active assignment (`is_completed=False`) during the current time window.
+   - **Usage Example**:
+     ```python
+     employee = Employee.objects.get(id=1)
+     if employee.is_available:
+         print("Employee is available for assignment.")
+     else:
+         print("Employee is currently busy.")
+     ```
+
+---
+
+#### **⚙️ Usage Examples**
+
+1. **Create an Employee**:
+   ```python
+   from myapp.models import Employee, CustomUser
+
+   # Create a CustomUser with role 'EMPLOYEE'
+   user = CustomUser.objects.create_user(
+       phone_number="1234567890",
+       name="Alice Johnson",
+       role="EMPLOYEE",
+       password="securepassword"
+   )
+
+   # Link the user to an Employee
+   employee = Employee.objects.create(user=user)
+   print(f"Employee created: {employee}")
+   ```
+
+2. **Check Employee Availability**:
+   ```python
+   from myapp.models import Employee
+
+   employee = Employee.objects.get(id=1)
+   if employee.is_available:
+       print("Employee is available for assignment.")
+   else:
+       print("Employee is currently assigned to another task.")
+   ```
+
+3. **Delete an Employee**:
+   - Deleting an `Employee` will also delete the associated `CustomUser` due to the `on_delete=CASCADE` rule.
+
+   ```python
+   employee = Employee.objects.get(id=1)
+   employee.delete()
+   print("Employee and associated user deleted.")
+   ```
+
+---
+
+### 📅 Booking Model
+
+#### **🛠️ Purpose**
+The `Booking` model is used to manage customer bookings for pest control services. It tracks all details related to a booking, including customer information, service details, pricing, payment status, recurring services, and more. It also includes methods for data validation and logic for calculating totals and updating statuses dynamically.
+
+---
+
+#### **📜 Fields**
+
+| **Field Name**             | **Type**              | **Constraints**                               | **Description**                                                                                   |
+|-----------------------------|-----------------------|-----------------------------------------------|---------------------------------------------------------------------------------------------------|
+| `full_name`                | `CharField`          | `max_length=255`                             | Full name of the customer.                                                                        |
+| `email`                    | `EmailField`         |                                               | Email address of the customer.                                                                   |
+| `phone_number`             | `CharField`          | `max_length=13`                              | Phone number in the format `+91XXXXXXXXXX`. Validated using the `clean` method.                  |
+| `address`                  | `TextField`          |                                               | Customer's address.                                                                               |
+| `latitude`                 | `DecimalField`       | `max_digits=9, decimal_places=6`             | Latitude for geolocation. Default: 19.0330.                                                      |
+| `longitude`                | `DecimalField`       | `max_digits=9, decimal_places=6`             | Longitude for geolocation. Default: 73.0297.                                                     |
+| `zipcode`                  | `CharField`          | `max_length=6`                               | Zipcode of the address.                                                                           |
+| `service_name`             | `CharField`          | `max_length=255`                             | Name of the service booked (e.g., "Rodent Pest Control").                                         |
+| `plan`                     | `CharField`          | `max_length=255, blank=True, null=True`      | Plan type. Required for certain services.                                                        |
+| `property_type`            | `CharField`          | `max_length=255, blank=True, null=True`      | Type of property (e.g., Residential, Commercial). Conditionally required.                        |
+| `house_condition`          | `CharField`          | `max_length=255, blank=True, null=True`      | Condition of the house (e.g., Clean, Infested). Conditionally required.                          |
+| `location`                 | `CharField`          | `max_length=255, blank=True, null=True`      | Additional location details. Conditionally required.                                             |
+| `booking_date`             | `DateField`          |                                               | Date of the booking.                                                                              |
+| `booking_time`             | `TimeField`          |                                               | Time of the booking.                                                                              |
+| `price`                    | `DecimalField`       | `max_digits=10, decimal_places=2`            | Base price for the service.                                                                      |
+| `gst`                      | `DecimalField`       | `max_digits=10, decimal_places=2`            | GST calculated at 18% of the price. Automatically computed in the `save` method.                 |
+| `payment_gateway_charges`  | `DecimalField`       | `max_digits=10, decimal_places=2`            | Payment gateway charges (2.6% of the price). Automatically computed in the `save` method.        |
+| `grand_total`              | `DecimalField`       | `max_digits=10, decimal_places=2`            | Total amount payable after adding GST and payment gateway charges.                               |
+| `payment_status`           | `BooleanField`       | `default=False`                              | Indicates whether the payment has been completed.                                                |
+| `status`                   | `CharField`          | `choices=STATUS_CHOICES, default='PENDING'`  | Current status of the booking (e.g., PENDING, WORK_ASSIGNED, etc.).                              |
+| `secure_token`             | `UUIDField`          | `unique=True, editable=False`                | Secure token for accessing booking details.                                                      |
+| `total_employees_required` | `IntegerField`       | `default=1`                                  | Number of employees required for the service. Automatically set based on the service type.       |
+| `recurring_services_count` | `IntegerField`       | `default=1`                                  | Number of recurring services remaining.                                                          |
+| `next_service_date`        | `DateField`          | `null=True, blank=True`                      | Date for the next recurring service.                                                             |
+| `next_service_time`        | `TimeField`          | `null=True, blank=True`                      | Time for the next recurring service.                                                             |
+| `offer_name`               | `CharField`          | `max_length=255, blank=True, null=True`      | Name of the applied offer, if any.                                                              |
+| `offer_applied`            | `BooleanField`       | `default=False`                              | Indicates whether an offer has been applied. Automatically validated in the `clean` method.      |
+| `is_package`               | `BooleanField`       | `default=False`                              | Indicates if the booking involves a package with multiple services.                              |
+| `total_service_count`      | `PositiveIntegerField`| `default=1`                                 | Total number of services in the booking.                                                         |
+| `service_status`           | `CharField`          | `max_length=50, default="new"`               | Status of the service (e.g., new, existing, completed). Automatically updated in `save` method.  |
+| `booking_link_sent`        | `IntegerField`       | `default=0`                                  | Number of times the booking link has been sent.                                                  |
+| `created_at`               | `DateTimeField`      | `auto_now_add=True`                          | Timestamp when the booking was created.                                                          |
+
+---
+
+#### **🔗 Relationships**
+- **None** (This is a standalone model).
+
+---
+
+#### **🔄 Methods**
+
+1. **`clean`**:
+   - Validates the phone number format and ensures it starts with `+91`.
+   - Checks if the applied offer is active; if not, validates that certain fields (`plan`, `property_type`, `house_condition`, `location`) are filled.
+
+2. **`save`**:
+   - Automatically calculates `gst`, `payment_gateway_charges`, and `grand_total` based on the `price`.
+   - Sets the `total_employees_required` based on the service type.
+   - Configures recurring services and package details based on the selected plan.
+   - Updates the booking status and service status dynamically.
+
+3. **`update_service_status`**:
+   - Updates the `service_status` field based on the booking's current status and recurring services.
+
+---
+
+#### **📋 Status Choices**
+
+| **Status**                  | **Description**                                                                 |
+|-----------------------------|---------------------------------------------------------------------------------|
+| `PENDING`                  | Booking is pending and has not been assigned for inspection or work yet.         |
+| `INSPECTION_ASSIGNED`      | An inspection has been assigned to the booking.                                  |
+| `INSPECTION_COMPLETED`     | Inspection is complete, and the booking is ready for work.                       |
+| `WORK_ASSIGNED`            | Work has been assigned for the booking.                                          |
+| `SERVICE_COMPLETED`        | Service has been completed for the booking.                                      |
+
+---
+
+#### **📋 Service Status Choices**
+
+| **Service Status**          | **Description**                                                                 |
+|-----------------------------|---------------------------------------------------------------------------------|
+| `new`                      | The booking is newly created.                                                   |
+| `existing`                 | The booking has ongoing or recurring services.                                  |
+| `completed`                | All services in the booking have been completed.                                |
+
+---
+
+#### **⚙️ Usage Examples**
+
+1. **Create a New Booking**:
+   ```python
+   from myapp.models import Booking
+   from datetime import date, time
+
+   booking = Booking.objects.create(
+       full_name="John Doe",
+       email="johndoe@example.com",
+       phone_number="+911234567890",
+       address="123 Main Street, City",
+       zipcode="123456",
+       service_name="General Pest Control",
+       plan="Annual Package 03 Services",
+       booking_date=date(2025, 5, 10),
+       booking_time=time(10, 30),
+       price=5000.00
+   )
+   print(f"Booking created: {booking.secure_token}")
+   ```
+
+2. **Update Service Status**:
+   ```python
+   booking = Booking.objects.get(id=1)
+   booking.update_service_status()
+   print(f"Updated service status: {booking.service_status}")
+   ```
+
+3. **Validate Phone Number**:
+   ```python
+   booking = Booking.objects.get(id=1)
+   try:
+       booking.clean()
+   except ValidationError as e:
+       print(f"Validation error: {e.messages}")
+   ```
+
+---
+
+### 📋 Assignment Model
+
+#### **🛠️ Purpose**
+The `Assignment` model is used to manage the assignment of employees to specific bookings. It tracks details such as the type of assignment (e.g., inspection or work), who assigned it, and the time window for the assignment. It also keeps track of whether the assignment has been completed.
+
+---
+
+#### **📜 Fields**
+
+| **Field Name**       | **Type**              | **Constraints**                               | **Description**                               |
+|-----------------------|-----------------------|-----------------------------------------------|-----------------------------------------------|
+| `booking`            | `ForeignKey`         | Related to `Booking`, `on_delete=CASCADE`    | Links the assignment to a specific booking.   |
+| `employee`           | `ForeignKey`         | Related to `Employee`, `on_delete=CASCADE`   | Links the assignment to a specific employee.  |
+| `assigned_by`        | `ForeignKey`         | Related to `CustomUser`, `on_delete=SET_NULL`, `null=True, blank=True` | The user who created the assignment.         |
+| `assignment_type`    | `CharField`          | `choices=ASSIGNMENT_TYPE_CHOICES`            | Specifies the type of assignment (e.g., `INSPECTION`, `WORK`). |
+| `assigned_at`        | `DateTimeField`      | `auto_now_add=True`                          | Timestamp when the assignment was created.    |
+| `completed_at`       | `DateTimeField`      | `null=True, blank=True`                      | Timestamp when the assignment was completed.  |
+| `is_completed`       | `BooleanField`       | `default=False`                              | Indicates whether the assignment has been completed. |
+| `start_time`         | `DateTimeField`      |                                               | Start time of the assignment.                 |
+| `end_time`           | `DateTimeField`      |                                               | End time of the assignment.                   |
+
+---
+
+#### **🔗 Relationships**
+- **`Booking`**: A `ForeignKey` linking the assignment to a specific booking.
+- **`Employee`**: A `ForeignKey` linking the assignment to an employee. The employee's availability is managed based on the assignment's status.
+- **`CustomUser`**: A `ForeignKey` linking the assignment to the user who assigned it. This field is optional (can be `null` or `blank`).
+
+---
+
+#### **🔄 Methods**
+
+1. **`save`**:
+   - Overrides the default `save` method. Although commented out in the code, it includes logic to manage the availability of employees based on the assignment's completion status.
+
+2. **`__str__`**:
+   - Returns a string representation of the assignment in the format:  
+     `"{booking.full_name} - {assignment_type} - {'Completed' if is_completed else 'In Progress'}"`
+
+---
+
+#### **📋 Assignment Type Choices**
+
+| **Assignment Type**  | **Description**                        |
+|-----------------------|----------------------------------------|
+| `INSPECTION`         | An assignment for inspection purposes. |
+| `WORK`               | An assignment for work or service delivery. |
+
+---
+
+#### **⚙️ Usage Examples**
+
+1. **Create a New Assignment**:
+   ```python
+   from myapp.models import Assignment, Booking, Employee, CustomUser
+   from datetime import datetime, timedelta
+
+   # Fetch booking and employee
+   booking = Booking.objects.get(id=1)
+   employee = Employee.objects.get(id=1)
+   user = CustomUser.objects.get(id=1)
+
+   # Create an assignment
+   assignment = Assignment.objects.create(
+       booking=booking,
+       employee=employee,
+       assigned_by=user,
+       assignment_type="INSPECTION",
+       start_time=datetime.now(),
+       end_time=datetime.now() + timedelta(hours=2),
+   )
+   print(f"Assignment created: {assignment}")
+   ```
+
+2. **Mark an Assignment as Completed**:
+   ```python
+   from datetime import datetime
+
+   assignment = Assignment.objects.get(id=1)
+   assignment.is_completed = True
+   assignment.completed_at = datetime.now()
+   assignment.save()
+   print("Assignment marked as completed.")
+   ```
+
+3. **Query Active Assignments**:
+   ```python
+   active_assignments = Assignment.objects.filter(is_completed=False)
+   for assignment in active_assignments:
+       print(assignment)
+   ```
+
+4. **Get Assignments for a Specific Employee**:
+   ```python
+   employee = Employee.objects.get(id=1)
+   assignments = Assignment.objects.filter(employee=employee, is_completed=False)
+   print(f"Assignments for {employee}: {assignments}")
+   ```
+
+---
+
+#### **🔄 Business Logic**
+
+- **Employee Availability**:
+  - Although the employee's availability is not directly stored in the `Assignment` model, the `is_available` property in the `Employee` model relies on the `Assignment` model to determine if the employee has any active assignments during the current time.
+
+- **Time Constraints**:
+  - The `start_time` and `end_time` fields ensure that assignments are scheduled for specific time windows, preventing overlapping assignments for the same employee.
+
+---
+
+### 🎉 Offer Model
+
+#### **🛠️ Purpose**
+The `Offer` model is used to manage promotional offers for pest control services. It includes details about the offer, such as the services it applies to, its duration, pricing, discount, and status (active or expired).
+
+---
+
+#### **📜 Fields**
+
+| **Field Name**         | **Type**              | **Constraints**                               | **Description**                                                                                   |
+|-------------------------|-----------------------|-----------------------------------------------|---------------------------------------------------------------------------------------------------|
+| `offer_name`           | `CharField`          | `max_length=255`                             | The name of the offer (e.g., "Summer Discount").                                                  |
+| `offer_banner`         | `ImageField`         | `upload_to='uploads/offers/', blank=True, null=True` | Banner image for the offer (optional).                                                          |
+| `offer_description`    | `TextField`          |                                               | A detailed description of the offer.                                                             |
+| `price`                | `DecimalField`       | `max_digits=10, decimal_places=2`            | The original price of the service before the discount.                                            |
+| `discount`             | `DecimalField`       | `max_digits=5, decimal_places=2`             | Discount percentage applied to the offer (e.g., 20%).                                             |
+| `discount_price`       | `DecimalField`       | `max_digits=10, decimal_places=2, blank=True, null=True` | The final price after applying the discount. Automatically calculated in the `save` method.       |
+| `start_date`           | `DateTimeField`      |                                               | The date and time when the offer starts.                                                         |
+| `end_date`             | `DateTimeField`      |                                               | The date and time when the offer expires.                                                        |
+| `status`               | `CharField`          | `choices=STATUS_CHOICES, default='ACTIVE'`   | The current status of the offer (`ACTIVE` or `EXPIRED`). Automatically updated in the `save` method. |
+| `services`             | `MultiSelectField`   | `choices=SERVICE_CHOICES`                    | The services to which this offer applies.                                                        |
+
+---
+
+#### **🔗 Relationships**
+- **None** (This is a standalone model for managing offers).
+
+---
+
+#### **🔄 Methods**
+
+1. **`save`**:
+   - Automatically calculates the `discount_price` based on the `price` and `discount` fields.
+   - Updates the `status` field based on whether the `end_date` has passed.
+   - **Example**:
+     ```python
+     offer = Offer.objects.get(id=1)
+     offer.save()  # Automatically updates the discount price and status
+     ```
+
+2. **`__str__`**:
+   - Returns the name of the offer.
+   - **Example**:
+     ```python
+     offer = Offer.objects.get(id=1)
+     print(str(offer))  # Output: "Summer Discount"
+     ```
+
+---
+
+#### **📋 Status Choices**
+
+| **Status**   | **Description**                                      |
+|--------------|------------------------------------------------------|
+| `ACTIVE`     | The offer is currently active and valid.             |
+| `EXPIRED`    | The offer has expired (end date has passed).         |
+
+---
+
+#### **📋 Service Choices**
+
+| **Service Name**                | **Description**                                                                                       |
+|---------------------------------|-------------------------------------------------------------------------------------------------------|
+| `Bed Bug Control`               | Pest control service for bed bugs.                                                                   |
+| `General Pest Control`          | General pest control service for common pests.                                                       |
+| `Honey Bee Control`             | Pest control service for honey bees.                                                                 |
+| `Cockroach Control`             | Pest control service for cockroaches.                                                                |
+| `Thermal Fogging`               | Thermal fogging service for pest control.                                                            |
+| `Mosquitoes Control`            | Pest control service for mosquitoes.                                                                 |
+| `Dust-Mite Control`             | Pest control service for dust mites.                                                                 |
+| `Anti Termite Control`          | Pest control service for termites.                                                                   |
+| `Flies Control`                 | Pest control service for flies.                                                                      |
+| `Rodent Pest Control`           | Pest control service for rodents.                                                                    |
+| `Anti Fungal Treatment`         | Treatment for fungal issues.                                                                         |
+| `Wood Borer Treatment`          | Pest control service for wood borers.                                                                |
+| `Ticks Control`                 | Pest control service for ticks.                                                                      |
+| `All`                           | Applies to all services.                                                                             |
+
+---
+
+#### **⚙️ Usage Examples**
+
+1. **Create a New Offer**:
+   ```python
+   from myapp.models import Offer
+   from datetime import datetime, timedelta
+
+   offer = Offer.objects.create(
+       offer_name="Summer Discount",
+       offer_description="Get 20% off on pest control services!",
+       price=5000.00,
+       discount=20.00,
+       start_date=datetime.now(),
+       end_date=datetime.now() + timedelta(days=30),
+       services=["Bed Bug Control", "General Pest Control"]
+   )
+   print(f"Offer created: {offer}")
+   ```
+
+2. **Check Offer Status**:
+   ```python
+   offer = Offer.objects.get(id=1)
+   print(f"Offer '{offer.offer_name}' is currently {offer.status}.")
+   ```
+
+3. **Update Offer**:
+   - Automatically updates `discount_price` and `status` when saved.
+   ```python
+   offer = Offer.objects.get(id=1)
+   offer.discount = 25.00  # Update the discount
+   offer.save()  # Updates the discount price and status
+   ```
+
+4. **Filter Active Offers**:
+   ```python
+   active_offers = Offer.objects.filter(status="ACTIVE")
+   for offer in active_offers:
+       print(offer)
+   ```
+
+---
+
+#### **🔄 Business Logic**
+
+- **Automatic Expiration**:
+  - Offers automatically expire when the `end_date` is in the past. The `status` field is updated to `EXPIRED` during the `save` method.
+
+- **Discount Calculation**:
+  - The `discount_price` is calculated as `price - (price * discount / 100)` and stored for easy access.
+
+- **Service Applicability**:
+  - The `services` field allows multiple services to be selected for a single offer using the `MultiSelectField`.
+
+---
+
+### 💬 Message Model
+
+#### **🛠️ Purpose**
+The `Message` model is used for managing chat and support messages between users. It records the sender, receiver, message content, and the timestamp of when the message was sent. This can be used for both chat systems and support ticket communication.
+
+---
+
+#### **📜 Fields**
+
+| **Field Name**       | **Type**              | **Constraints**                               | **Description**                               |
+|-----------------------|-----------------------|-----------------------------------------------|-----------------------------------------------|
+| `sender`             | `ForeignKey`         | Related to `AUTH_USER_MODEL`, `on_delete=CASCADE`, `related_name="sent_messages"` | The user who sent the message.               |
+| `receiver`           | `ForeignKey`         | Related to `AUTH_USER_MODEL`, `on_delete=CASCADE`, `related_name="received_messages"` | The user who received the message.           |
+| `message`            | `TextField`          |                                               | The content of the message.                   |
+| `timestamp`          | `DateTimeField`      | `auto_now_add=True`                          | The date and time when the message was sent.  |
+
+---
+
+#### **🔗 Relationships**
+- **`sender`**: A `ForeignKey` linking the message to the user who sent it.
+- **`receiver`**: A `ForeignKey` linking the message to the user who received it.
+
+---
+
+#### **🔄 Methods**
+
+1. **`__str__`**:
+   - Returns a string representation of the message in the format:  
+     `"From {sender.name} to {receiver.name}: {message[:30]}"`.
+   - **Example**:
+     ```python
+     message = Message.objects.get(id=1)
+     print(str(message))  # Output: "From John Doe to Jane Doe: Hello, how can I help yo..."
+     ```
+
+---
+
+#### **⚙️ Usage Examples**
+
+1. **Send a New Message**:
+   ```python
+   from myapp.models import Message
+   from django.contrib.auth import get_user_model
+
+   User = get_user_model()
+
+   # Fetch sender and receiver
+   sender = User.objects.get(phone_number="+911234567890")
+   receiver = User.objects.get(phone_number="+919876543210")
+
+   # Send a message
+   message = Message.objects.create(
+       sender=sender,
+       receiver=receiver,
+       message="Hi there! How can I assist you?"
+   )
+   print(f"Message sent: {message}")
+   ```
+
+2. **Retrieve Messages Between Two Users**:
+   ```python
+   from myapp.models import Message
+
+   sender = User.objects.get(phone_number="+911234567890")
+   receiver = User.objects.get(phone_number="+919876543210")
+
+   chat = Message.objects.filter(sender=sender, receiver=receiver) | Message.objects.filter(sender=receiver, receiver=sender)
+   chat = chat.order_by("timestamp")  # Order messages chronologically
+
+   for message in chat:
+       print(f"{message.timestamp}: {message}")
+   ```
+
+3. **Delete a Message**:
+   ```python
+   message = Message.objects.get(id=1)
+   message.delete()
+   print("Message deleted.")
+   ```
+
+---
+
+#### **🔄 Business Logic**
+
+- **Message Storage**:
+  - Messages are stored as plain text in the `message` field.
+  - The `timestamp` ensures that messages can be displayed in chronological order.
+
+- **User Linking**:
+  - The `sender` and `receiver` fields link messages to users, enabling easy retrieval of sent and received messages.
+
+---
+
+### 💳 Payment Model
+
+#### **🛠️ Purpose**
+The `Payment` model is used to manage payment details for bookings. It links payments to bookings, tracks payment statuses, and stores Razorpay-related payment information such as order ID, payment ID, and signature. This model ensures that each booking has a corresponding payment record.
+
+---
+
+#### **📜 Fields**
+
+| **Field Name**          | **Type**              | **Constraints**                               | **Description**                               |
+|--------------------------|-----------------------|-----------------------------------------------|-----------------------------------------------|
+| `booking`               | `OneToOneField`       | Related to `Booking`, `on_delete=CASCADE`, `related_name="payment"` | Links the payment to a single booking.       |
+| `razorpay_order_id`     | `CharField`          | `max_length=100, blank=True, null=True`      | The unique Razorpay order ID for the payment. |
+| `razorpay_payment_id`   | `CharField`          | `max_length=100, blank=True, null=True`      | The unique Razorpay payment ID for the payment. |
+| `razorpay_signature`    | `CharField`          | `max_length=255, blank=True, null=True`      | The Razorpay signature for verifying payment authenticity. |
+| `amount`                | `DecimalField`       | `max_digits=10, decimal_places=2`            | The total amount paid, typically matching the booking's grand total. |
+| `status`                | `CharField`          | `choices=[("PENDING", "Pending"), ("SUCCESS", "Success"), ("FAILED", "Failed")], default="PENDING"` | The current status of the payment.           |
+| `created_at`            | `DateTimeField`      | `auto_now_add=True`                          | The date and time when the payment record was created. |
+
+---
+
+#### **🔗 Relationships**
+- **`Booking`**: A `OneToOneField` linking each payment to a single booking. When a booking is deleted, its associated payment is also deleted due to the `on_delete=CASCADE` rule.
+
+---
+
+#### **🔄 Methods**
+
+1. **`__str__`**:
+   - Returns a string representation of the payment in the format:  
+     `"Payment for Booking {booking.id} - {status}"`.
+   - **Example**:
+     ```python
+     payment = Payment.objects.get(id=1)
+     print(str(payment))  # Output: "Payment for Booking 1 - Success"
+     ```
+
+---
+
+#### **📋 Status Choices**
+
+| **Status**   | **Description**                                      |
+|--------------|------------------------------------------------------|
+| `PENDING`    | The payment is pending and has not been completed yet. |
+| `SUCCESS`    | The payment was successfully completed.              |
+| `FAILED`     | The payment failed to process.                      |
+
+---
+
+#### **⚙️ Usage Examples**
+
+1. **Create a New Payment**:
+   ```python
+   from myapp.models import Payment, Booking
+
+   booking = Booking.objects.get(id=1)
+
+   # Create a payment record
+   payment = Payment.objects.create(
+       booking=booking,
+       razorpay_order_id="order_ABC123",
+       razorpay_payment_id="pay_XYZ456",
+       razorpay_signature="signature_789",
+       amount=booking.grand_total,
+       status="SUCCESS"
+   )
+   print(f"Payment created: {payment}")
+   ```
+
+2. **Retrieve Payment for a Booking**:
+   ```python
+   booking = Booking.objects.get(id=1)
+   payment = booking.payment  # Access the related payment using `related_name`
+   print(f"Payment details: {payment}")
+   ```
+
+3. **Filter Payments by Status**:
+   ```python
+   successful_payments = Payment.objects.filter(status="SUCCESS")
+   for payment in successful_payments:
+       print(payment)
+   ```
+
+4. **Check Payment Status**:
+   ```python
+   payment = Payment.objects.get(id=1)
+   if payment.status == "SUCCESS":
+       print("Payment was successful.")
+   elif payment.status == "PENDING":
+       print("Payment is still pending.")
+   else:
+       print("Payment failed.")
+   ```
+
+---
+
+#### **🔄 Business Logic**
+
+- **Payment Integrity**:
+  - Razorpay-related fields (`razorpay_order_id`, `razorpay_payment_id`, `razorpay_signature`) can be used to verify payment authenticity.
+  
+- **Booking-Payment Link**:
+  - Each booking must have exactly one payment record due to the `OneToOneField` relationship.
+
+- **Status Updates**:
+  - The `status` field allows tracking the progress of a payment (e.g., from `PENDING` to `SUCCESS` or `FAILED`).
+
+---
+
+### 📞 ContactForm Model
+
+#### **🛠️ Purpose**
+The `ContactForm` model is used to manage user-submitted contact forms. It stores details such as the user's name, email, mobile number, their message, and the time the form was created. This model is useful for handling inquiries, support requests, or feedback from users.
+
+---
+
+#### **📜 Fields**
+
+| **Field Name**     | **Type**              | **Constraints**                               | **Description**                               |
+|---------------------|-----------------------|-----------------------------------------------|-----------------------------------------------|
+| `name`             | `CharField`          | `max_length=255`                             | The name of the person submitting the form.   |
+| `email`            | `EmailField`         |                                               | The email address of the sender.              |
+| `mobile`           | `CharField`          | `max_length=15`                              | Mobile number of the sender.                  |
+| `message`          | `TextField`          |                                               | The message or inquiry submitted by the user. |
+| `created_at`       | `DateTimeField`      | `auto_now_add=True`                          | Timestamp indicating when the form was created. |
+
+---
+
+#### **🔗 Relationships**
+- **None** (This is a standalone model for managing contact form submissions).
+
+---
+
+#### **🔄 Methods**
+
+1. **`__str__`**:
+   - Returns a string representation of the contact form submission in the format:  
+     `"{name} - {message}"`.
+   - **Example**:
+     ```python
+     contact = ContactForm.objects.get(id=1)
+     print(str(contact))  # Output: "John Doe - I need assistance with my booking."
+     ```
+
+---
+
+#### **⚙️ Usage Examples**
+
+1. **Create a New Contact Form Entry**:
+   ```python
+   from myapp.models import ContactForm
+
+   contact = ContactForm.objects.create(
+       name="John Doe",
+       email="johndoe@example.com",
+       mobile="+911234567890",
+       message="I need assistance with my booking."
+   )
+   print(f"Contact form submitted by: {contact.name}")
+   ```
+
+2. **Retrieve All Contact Form Submissions**:
+   ```python
+   from myapp.models import ContactForm
+
+   contacts = ContactForm.objects.all()
+   for contact in contacts:
+       print(f"{contact.created_at}: {contact.name} - {contact.message}")
+   ```
+
+3. **Filter Submissions by Email**:
+   ```python
+   contacts = ContactForm.objects.filter(email="johndoe@example.com")
+   for contact in contacts:
+       print(contact)
+   ```
+
+4. **Delete a Contact Form Entry**:
+   ```python
+   contact = ContactForm.objects.get(id=1)
+   contact.delete()
+   print("Contact form entry deleted.")
+   ```
+
+---
+
+#### **🔄 Business Logic**
+
+- **User Inquiries**:
+  - This model provides a centralized way to store and manage user inquiries or feedback.
+  
+- **Time Tracking**:
+  - The `created_at` field helps track when each contact form was submitted, making it easier to prioritize or follow up.
+
+---
+### 📝 Feedback Model
+
+#### **🛠️ Purpose**
+The `Feedback` model is used to store feedback submitted by users. It tracks the user's name, email, feedback message, and the time when the feedback was submitted. This model can be used to gather insights, suggestions, or complaints from users.
+
+---
+
+#### **📜 Fields**
+
+| **Field Name**     | **Type**              | **Constraints**                               | **Description**                               |
+|---------------------|-----------------------|-----------------------------------------------|-----------------------------------------------|
+| `name`             | `CharField`          | `max_length=255`                             | The name of the person submitting the feedback. |
+| `email`            | `EmailField`         |                                               | The email address of the person providing feedback. |
+| `message`          | `TextField`          |                                               | The feedback message submitted by the user.   |
+| `created_at`       | `DateTimeField`      | `auto_now_add=True`                          | Timestamp indicating when the feedback was submitted. |
+
+---
+
+#### **🔗 Relationships**
+- **None** (This is a standalone model for managing user feedback).
+
+---
+
+#### **🔄 Methods**
+
+1. **`__str__`**:
+   - Returns a string representation of the feedback, which is the name of the user who provided it.
+   - **Example**:
+     ```python
+     feedback = Feedback.objects.get(id=1)
+     print(str(feedback))  # Output: "John Doe"
+     ```
+
+---
+
+#### **⚙️ Usage Examples**
+
+1. **Submit Feedback**:
+   ```python
+   from myapp.models import Feedback
+
+   feedback = Feedback.objects.create(
+       name="John Doe",
+       email="johndoe@example.com",
+       message="I really appreciate your services!"
+   )
+   print(f"Feedback submitted by: {feedback.name}")
+   ```
+
+2. **Retrieve All Feedback**:
+   ```python
+   from myapp.models import Feedback
+
+   feedback_list = Feedback.objects.all()
+   for feedback in feedback_list:
+       print(f"{feedback.created_at}: {feedback.name} - {feedback.message}")
+   ```
+
+3. **Filter Feedback by Email**:
+   ```python
+   feedbacks = Feedback.objects.filter(email="johndoe@example.com")
+   for feedback in feedbacks:
+       print(feedback)
+   ```
+
+4. **Delete Feedback**:
+   ```python
+   feedback = Feedback.objects.get(id=1)
+   feedback.delete()
+   print("Feedback entry deleted.")
+   ```
+
+---
+
+#### **🔄 Business Logic**
+
+- **User Insights**:
+  - This model is useful for collecting user insights, suggestions, or complaints to improve services or operations.
+  
+- **Time Tracking**:
+  - The `created_at` field helps in tracking feedback trends over time.
+
+---
 
 
 
