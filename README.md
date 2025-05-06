@@ -810,8 +810,7 @@ curl -X POST http://127.0.0.1:8000/api/register/ \
   "phone_number": "+911234567890",
   "name": "John Doe",
   "role": "EMPLOYEE",
-  "password": "securepassword123",
-  "profile_photo": "<Optional: Base64 Encoded Image>"
+  "password": "securepassword123"
 }
 ```
 
@@ -894,4 +893,1014 @@ Example in **Postman**:
   }
 }
 ```
+### **2. Login**
+
+#### **User Login**
+- **URL**: `/login/`
+- **Method**: `POST`
+- **Authentication**: Not Required
+- **Description**: Allows users to log in using their phone number and password. Employees are restricted from logging in.
+
+##### **Headers**
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+---
+
+### **Request Body (JSON Format)**
+
+```json
+{
+  "phone_number": "+911234567890",
+  "password": "securepassword123"
+}
+```
+
+---
+
+### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+{
+  "access": "eyJ0eXAiOiJKV1QiLCJh...<truncated>",
+  "role": "ADMIN"
+}
+```
+
+---
+
+### **Response on Forbidden Access (Employee Login)**
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "error": "Employees are not allowed to log in."
+}
+```
+
+---
+
+### **Response on Invalid Credentials**
+- **Status**: `401 Unauthorized`
+
+```json
+{
+  "error": "Invalid Credentials"
+}
+```
+
+---
+
+### **3. Reset Password Workflow**
+
+#### **3.1 Request Password Reset OTP**
+- **URL**: `/request-reset-otp/`
+- **Method**: `POST`
+- **Authentication**: Not Required
+- **Description**: Sends a password reset OTP to the user's registered phone number.
+
+##### **Headers**
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+---
+
+### **Request Body (JSON Format)**
+
+```json
+{
+  "phone_number": "+911234567890"
+}
+```
+
+---
+
+### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+{
+  "message": "OTP sent to your phone."
+}
+```
+
+---
+
+### **Response on Missing Phone Number**
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "error": "Phone number is required."
+}
+```
+
+---
+
+### **Response on Non-Existent User**
+- **Status**: `404 Not Found`
+
+```json
+{
+  "error": "User with this phone number does not exist."
+}
+```
+
+---
+
+#### **3.2 Verify Password Reset OTP**
+- **URL**: `/verify-reset-otp/`
+- **Method**: `POST`
+- **Authentication**: Not Required
+- **Description**: Verifies the password reset OTP sent to the user.
+
+##### **Headers**
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+---
+
+### **Request Body (JSON Format)**
+
+```json
+{
+  "phone_number": "+911234567890",
+  "otp": "123456"
+}
+```
+
+---
+
+### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+{
+  "message": "OTP verified. You can now reset your password."
+}
+```
+
+---
+
+### **Response on Missing Data**
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "error": "Phone number and OTP are required."
+}
+```
+
+---
+
+### **Response on Invalid OTP**
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "error": "Invalid OTP."
+}
+```
+
+---
+
+### **Response on Expired OTP**
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "error": "OTP expired."
+}
+```
+
+---
+
+### **Response on Already Used OTP**
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "error": "OTP already used."
+}
+```
+
+---
+
+#### **3.3 Reset Password**
+- **URL**: `/reset-password/`
+- **Method**: `POST`
+- **Authentication**: Not Required
+- **Description**: Resets the user's password after OTP verification.
+
+##### **Headers**
+```json
+{
+  "Content-Type": "application/json"
+}
+```
+
+---
+
+### **Request Body (JSON Format)**
+
+```json
+{
+  "phone_number": "+911234567890",
+  "new_password": "newsecurepassword123"
+}
+```
+
+---
+
+### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+{
+  "message": "Password reset successful."
+}
+```
+
+---
+
+### **Response on Missing Data**
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "error": "Phone number and new password are required."
+}
+```
+
+---
+
+### **Response on Missing OTP Verification**
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "error": "OTP verification required."
+}
+```
+
+---
+
+### **Response on Non-Existent User**
+- **Status**: `404 Not Found`
+
+```json
+{
+  "error": "User not found."
+}
+```
+
+---
+
+### **4. User Info**
+
+#### **4.1 Get User Information**
+- **URL**: `/user-info/`
+- **Method**: `GET`
+- **Authentication**: Required (Bearer Token)
+- **Description**: Fetches the authenticated user's information.
+
+##### **Headers**
+```json
+{
+  "Authorization": "Bearer <token>"
+}
+```
+
+---
+
+### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+{
+  "phone_number": "+911234567890",
+  "name": "John Doe",
+  "role": "ADMIN",
+  "profile_photo": "http://example.com/media/profile_photos/user.jpg"
+}
+```
+
+---
+
+#### **4.2 Update User Information**
+- **URL**: `/user-info/`
+- **Method**: `PUT`
+- **Authentication**: Required (Bearer Token)
+- **Description**: Updates the authenticated user's information. Only `name` and `profile_photo` can be updated. `phone_number` and `role` are read-only.
+
+##### **Headers**
+```json
+{
+  "Authorization": "Bearer <token>"
+}
+```
+
+---
+
+### **Request Body (JSON Format)**
+
+```json
+{
+  "name": "John Updated"
+}
+```
+
+---
+
+### **Request Body (Form Data)**
+
+When updating the profile photo, use `multipart/form-data`. Include:
+
+| Key             | Value Type     | Description                              |
+|------------------|---------------|------------------------------------------|
+| `name`          | String         | User's updated name.                     |
+| `profile_photo` | File (optional)| User's updated profile photo (image).    |
+
+**Example in Form Data:**
+- `name`: "John Updated"
+- `profile_photo`: [Upload File]
+
+---
+
+### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+{
+  "phone_number": "+911234567890",
+  "name": "John Updated",
+  "role": "ADMIN",
+  "profile_photo": "http://example.com/media/profile_photos/user_updated.jpg"
+}
+```
+
+---
+
+### **Response on Invalid Data**
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "profile_photo": ["Invalid image format."]
+}
+```
+
+---
+
+### **5. Users List**
+
+#### **5.1 Get Users List**
+- **URL**: `/users/`
+- **Method**: `GET`
+- **Authentication**: Required (Bearer Token)
+- **Description**: Retrieves a list of users based on the role of the authenticated user.
+
+##### **Role-Based Access Control**:
+- **SUPERUSER**: Can view all users.
+- **ADMIN**: Can view users with roles `MANAGER` and `EMPLOYEE`.
+- **MANAGER**: Can view users with the role `EMPLOYEE`.
+- **EMPLOYEE**: No access to this endpoint.
+
+##### **Headers**
+```json
+{
+  "Authorization": "Bearer <token>"
+}
+```
+
+---
+
+### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+[
+  {
+    "id": 1,
+    "phone_number": "+911234567890",
+    "name": "John Doe",
+    "role": "MANAGER",
+    "profile_photo": "http://example.com/media/profile_photos/manager.jpg"
+  },
+  {
+    "id": 2,
+    "phone_number": "+911234567891",
+    "name": "Jane Smith",
+    "role": "EMPLOYEE",
+    "profile_photo": "http://example.com/media/profile_photos/employee.jpg"
+  }
+]
+```
+
+---
+
+### **Response on Forbidden Access**
+If the user does not have permission to access this endpoint (e.g., an EMPLOYEE):
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "detail": "You do not have permission to perform this action."
+}
+```
+
+---
+
+### **Response on Unauthorized Access**
+If the request is made without a valid token:
+- **Status**: `401 Unauthorized`
+
+```json
+{
+  "detail": "Authentication credentials were not provided."
+}
+```
+
+---
+
+### **6. User List**
+
+#### **6.1 Get Users List for Dropdowns/Messages**
+- **URL**: `/users/list/`
+- **Method**: `GET`
+- **Authentication**: Required (Bearer Token)
+- **Description**: Retrieves a list of users excluding the currently logged-in user. The list is ordered by roles: `SUPERUSER` first, followed by `ADMIN`, and then `MANAGER`.
+
+##### **Headers**
+```json
+{
+  "Authorization": "Bearer <token>"
+}
+```
+
+---
+
+### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+[
+  {
+    "id": 1,
+    "phone_number": "+911234567890",
+    "name": "Super User",
+    "role": "SUPERUSER",
+    "profile_photo": "http://example.com/media/profile_photos/superuser.jpg"
+  },
+  {
+    "id": 2,
+    "phone_number": "+911234567891",
+    "name": "Admin User",
+    "role": "ADMIN",
+    "profile_photo": "http://example.com/media/profile_photos/admin.jpg"
+  },
+  {
+    "id": 3,
+    "phone_number": "+911234567892",
+    "name": "Manager User",
+    "role": "MANAGER",
+    "profile_photo": "http://example.com/media/profile_photos/manager.jpg"
+  }
+]
+```
+
+---
+
+### **Response on Unauthorized Access**
+If the request is made without a valid token:
+- **Status**: `401 Unauthorized`
+
+```json
+{
+  "detail": "Authentication credentials were not provided."
+}
+```
+
+---
+
+### **7. Role-Based User List**
+
+#### **7.1 Get Users by Role**
+- **URL**: `/users/role/<str:role>/`
+- **Method**: `GET`
+- **Authentication**: Required (Bearer Token)
+- **Description**: Retrieves a list of users filtered by the specified role. Access is controlled based on the role of the authenticated user.
+
+##### **Role-Based Access Control**:
+- **SUPERUSER**: Can view all users for any role.
+- **ADMIN**: Can view users with roles `MANAGER` and `EMPLOYEE`.
+- **MANAGER**: Can view users with the role `EMPLOYEE`.
+- **EMPLOYEE**: No access to this endpoint.
+
+##### **Headers**
+```json
+{
+  "Authorization": "Bearer <token>"
+}
+```
+
+---
+
+### **Path Parameter**
+
+| Parameter | Type   | Description                                      |
+|-----------|--------|--------------------------------------------------|
+| `role`    | String | The role of users to filter (e.g., `SUPERUSER`, `ADMIN`, `MANAGER`, `EMPLOYEE`). |
+
+---
+
+### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+[
+  {
+    "id": 1,
+    "phone_number": "+911234567890",
+    "name": "John Doe",
+    "role": "MANAGER",
+    "profile_photo": "http://example.com/media/profile_photos/manager.jpg"
+  },
+  {
+    "id": 2,
+    "phone_number": "+911234567891",
+    "name": "Jane Smith",
+    "role": "MANAGER",
+    "profile_photo": "http://example.com/media/profile_photos/manager2.jpg"
+  }
+]
+```
+
+---
+
+### **Response on No Users Found or Access Denied**
+- **Status**: `404 Not Found`
+
+```json
+{
+  "message": "No users found or access denied."
+}
+```
+
+---
+
+### **Response on Unauthorized Access**
+If the request is made without a valid token:
+- **Status**: `401 Unauthorized`
+
+```json
+{
+  "detail": "Authentication credentials were not provided."
+}
+```
+
+---
+
+### **8. User Update**
+
+#### **8.1 Retrieve or Update User Details**
+- **URL**: `/users/update/<int:id>/`
+- **Method**: `GET`, `PUT`, `PATCH`
+- **Authentication**: Required (Bearer Token)
+- **Description**: Allows retrieving or updating user details based on the authenticated user's role. Role-based restrictions apply for updates.
+
+##### **Role-Based Access Control**:
+- **SUPERUSER**: Can retrieve and update all users.
+- **ADMIN**: Can retrieve and update `ADMIN`, `MANAGER`, and `EMPLOYEE` users but not `SUPERUSER`.
+- **MANAGER**: Can retrieve and update their own details and `EMPLOYEE` details but cannot change roles.
+- **EMPLOYEE**: Can only retrieve and update their own details.
+
+##### **Headers**
+```json
+{
+  "Authorization": "Bearer <token>"
+}
+```
+
+---
+
+### **GET: Retrieve User Details**
+
+#### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+{
+  "id": 5,
+  "phone_number": "+911234567890",
+  "name": "John Doe",
+  "role": "EMPLOYEE",
+  "profile_photo": "http://example.com/media/profile_photos/employee.jpg"
+}
+```
+
+---
+
+### **PUT/PATCH: Update User Details**
+
+#### **Request Body (JSON Format)**
+
+```json
+{
+  "name": "Updated Name",
+  "profile_photo": "http://example.com/media/profile_photos/new_profile.jpg",
+  "role": "MANAGER"  // Optional for SUPERUSER/ADMIN
+}
+```
+
+#### **Request Body (Form Data)**
+
+When updating the profile photo, use `multipart/form-data`. Include:
+
+| Key             | Value Type     | Description                              |
+|------------------|---------------|------------------------------------------|
+| `name`          | String         | User's updated name.                     |
+| `profile_photo` | File (optional)| User's updated profile photo (image).    |
+| `role`          | String         | Optional for role changes by `SUPERUSER` or `ADMIN`. |
+
+---
+
+### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+{
+  "id": 5,
+  "phone_number": "+911234567890",
+  "name": "Updated Name",
+  "role": "MANAGER",
+  "profile_photo": "http://example.com/media/profile_photos/new_profile.jpg"
+}
+```
+
+---
+
+### **Response on Forbidden Role Update**
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "error": "You do not have permission to edit this user."
+}
+```
+
+---
+
+### **Response on Unauthorized Role Change**
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "error": "You do not have permission to change roles."
+}
+```
+
+---
+
+### **Response on Attempt to Change SUPERUSER Role**
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "error": "The role of a SUPERUSER cannot be changed."
+}
+```
+
+---
+
+### **Response on Unauthorized Access**
+If the request is made without a valid token:
+- **Status**: `401 Unauthorized`
+
+```json
+{
+  "detail": "Authentication credentials were not provided."
+}
+```
+
+---
+### **9. User Detail**
+
+#### **9.1 Retrieve or Delete a User**
+- **URL**: `/users/<int:id>/`
+- **Method**: `GET`, `DELETE`
+- **Authentication**: Required (Bearer Token)
+- **Description**: Allows retrieving or deleting a specific user based on the authenticated user's role. Role-based restrictions apply for both operations.
+
+##### **Role-Based Access Control**:
+- **SUPERUSER**: Can retrieve or delete any user.
+- **ADMIN**: Can retrieve or delete `MANAGER` and `EMPLOYEE` users but not `SUPERUSER`.
+- **MANAGER**: Can retrieve or delete `EMPLOYEE` users only.
+- **EMPLOYEE**: No access to this endpoint.
+
+##### **Headers**
+```json
+{
+  "Authorization": "Bearer <token>"
+}
+```
+
+---
+
+### **GET: Retrieve User Details**
+
+#### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+{
+  "id": 5,
+  "phone_number": "+911234567890",
+  "name": "John Doe",
+  "role": "EMPLOYEE",
+  "profile_photo": "http://example.com/media/profile_photos/employee.jpg"
+}
+```
+
+---
+
+### **Response on Forbidden Access**
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "error": "You do not have permission to view this user."
+}
+```
+
+---
+
+### **DELETE: Delete a User**
+
+#### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+{
+  "message": "User deleted successfully."
+}
+```
+
+---
+
+### **Response on Forbidden Deletion**
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "error": "You do not have permission to delete this user."
+}
+```
+
+---
+
+### **Response on Unauthorized Access**
+If the request is made without a valid token:
+- **Status**: `401 Unauthorized`
+
+```json
+{
+  "detail": "Authentication credentials were not provided."
+}
+```
+
+---
+
+### **10. User Count**
+
+#### **10.1 Get User Counts by Role**
+- **URL**: `/users/count/`
+- **Method**: `GET`
+- **Authentication**: Required (Bearer Token)
+- **Description**: Retrieves the count of users by role. Role-based restrictions apply to determine which roles the authenticated user can view.
+
+##### **Role-Based Access Control**:
+- **SUPERUSER**: Can view counts for all roles (`SUPERUSER`, `ADMIN`, `MANAGER`, `EMPLOYEE`).
+- **ADMIN**: Can view counts for `MANAGER` and `EMPLOYEE` roles.
+- **MANAGER**: Can view the count for `EMPLOYEE` role.
+- **EMPLOYEE**: No access to this endpoint.
+
+##### **Headers**
+```json
+{
+  "Authorization": "Bearer <token>"
+}
+```
+
+---
+
+### **Query Parameters**
+
+| Parameter | Type   | Description                                      |
+|-----------|--------|--------------------------------------------------|
+| `role`    | String | (Optional) Specify a role to filter the count (e.g., `SUPERUSER`, `ADMIN`, `MANAGER`, `EMPLOYEE`). |
+
+---
+
+### **Response on Success (Specific Role)**
+If the `role` query parameter is provided:
+- **Status**: `200 OK`
+
+```json
+{
+  "MANAGER": 5
+}
+```
+
+---
+
+### **Response on Success (All Allowed Roles)**
+If no `role` query parameter is provided:
+- **Status**: `200 OK`
+
+```json
+[
+  {
+    "role": "MANAGER",
+    "count": 5
+  },
+  {
+    "role": "EMPLOYEE",
+    "count": 15
+  }
+]
+```
+
+---
+
+### **Response on Forbidden Access**
+If the user does not have permission to view the count for the specified role:
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "error": "You do not have permission to view this count."
+}
+```
+
+---
+
+### **Response on Unauthorized Access**
+If the request is made without a valid token:
+- **Status**: `401 Unauthorized`
+
+```json
+{
+  "detail": "Authentication credentials were not provided."
+}
+```
+
+---
+### **11. Employee Management**
+
+#### **11.1 Employee View**
+- **URL**: `/employees/`
+- **Method**: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`
+- **Authentication**: Required (Bearer Token)
+- **Description**: Provides CRUD operations for managing employees. Only users with valid authentication can access this endpoint.
+
+##### **Headers**
+```json
+{
+  "Authorization": "Bearer <token>"
+}
+```
+
+---
+
+### **GET: Retrieve Employee List**
+Retrieves a list of all employees. Employees are filtered by the `EMPLOYEE` role and ordered by their IDs in descending order.
+
+#### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+[
+  {
+    "id": 1,
+    "user": {
+      "id": 5,
+      "phone_number": "+911234567890",
+      "name": "John Employee",
+      "role": "EMPLOYEE",
+      "profile_photo": "http://example.com/media/profile_photos/employee.jpg"
+    },
+    "is_available": true
+  },
+  {
+    "id": 2,
+    "user": {
+      "id": 6,
+      "phone_number": "+911234567891",
+      "name": "Jane Employee",
+      "role": "EMPLOYEE",
+      "profile_photo": "http://example.com/media/profile_photos/employee2.jpg"
+    },
+    "is_available": false
+  }
+]
+```
+
+---
+
+### **POST: Create a New Employee**
+Allows the creation of a new employee.
+
+#### **Request Body (JSON Format)**
+
+```json
+{
+  "user": {
+    "phone_number": "+911234567892",
+    "name": "New Employee",
+    "role": "EMPLOYEE",
+    "profile_photo": "http://example.com/media/profile_photos/new_employee.jpg"
+  },
+  "is_available": true
+}
+```
+
+#### **Response on Success**
+- **Status**: `201 Created`
+
+```json
+{
+  "id": 3,
+  "user": {
+    "id": 7,
+    "phone_number": "+911234567892",
+    "name": "New Employee",
+    "role": "EMPLOYEE",
+    "profile_photo": "http://example.com/media/profile_photos/new_employee.jpg"
+  },
+  "is_available": true
+}
+```
+
+---
+
+### **PUT/PATCH: Update an Employee**
+Allows updating employee details.
+
+#### **Request Body (JSON Format)**
+
+```json
+{
+  "is_available": false
+}
+```
+
+#### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+{
+  "id": 3,
+  "user": {
+    "id": 7,
+    "phone_number": "+911234567892",
+    "name": "New Employee",
+    "role": "EMPLOYEE",
+    "profile_photo": "http://example.com/media/profile_photos/new_employee.jpg"
+  },
+  "is_available": false
+}
+```
+
+---
+
+### **DELETE: Delete an Employee**
+Allows deleting an employee record.
+
+#### **Response on Success**
+- **Status**: `204 No Content`
+
+---
+
+### **Response on Unauthorized Access**
+If the request is made without a valid token:
+- **Status**: `401 Unauthorized`
+
+```json
+{
+  "detail": "Authentication credentials were not provided."
+}
+```
+
+---
 
