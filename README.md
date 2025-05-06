@@ -729,9 +729,9 @@ This document provides a detailed guide for the APIs of **Super Star Pest Contro
 The API is designed to provide a seamless backend for managing services, bookings, employees, and more. It is built using **Django Rest Framework (DRF)** and follows RESTful principles.
 
 ### **Key Features**
-- **Authentication**: All endpoints require authentication using JWT tokens.
+- **Authentication**: All endpoints require authentication using JWT tokens with the `Bearer` scheme.
 - **CRUD Operations**: Create, Read, Update, and Delete resources like services, bookings, and employees.
-- **Integration**: APIs for RazorPay, email notifications, and Google Maps.
+- **Integration**: APIs for RazorPay, email notifications, Twilio and Google Maps.
 
 ---
 
@@ -751,7 +751,7 @@ The API is designed to provide a seamless backend for managing services, booking
 
 3. **Authentication**:
    - Authentication is handled using **JWT Tokens**.
-   - Obtain a token by logging in via the `/auth/login/` endpoint.
+   - Obtain a token by logging in via the `/api/login/` endpoint.
    - Include the token in the `Authorization` header for all requests:
      ```
      Authorization: Bearer <token>
@@ -771,8 +771,127 @@ You can test the API using tools like **Postman** or **cURL**.
 ### **Using cURL**
 Example cURL command for testing an endpoint:
 ```bash
-curl -X GET http://127.0.0.1:8000/api/bookings/ \
--H "Authorization: Bearer <token>"
+curl -X POST http://127.0.0.1:8000/api/register/ \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer <token>" \
+-d '{
+  "phone_number": "+911234567890",
+  "name": "John Doe",
+  "role": "EMPLOYEE",
+  "password": "securepassword123"
+}'
 ```
 
 ---
+
+## 📖 Endpoints
+
+### **1. Registration**
+
+#### **Register a New User**
+- **URL**: `/register/`
+- **Method**: `POST`
+- **Authentication**: Required (Bearer Token)
+- **Description**: Allows the registration of new users. Superusers can register freely, while other roles have restrictions based on their hierarchy.
+
+##### **Headers**
+```json
+{
+  "Authorization": "Bearer <token>"
+}
+```
+
+---
+
+### **Request Body (JSON Format)**
+
+```json
+{
+  "phone_number": "+911234567890",
+  "name": "John Doe",
+  "role": "EMPLOYEE",
+  "password": "securepassword123",
+  "profile_photo": "<Optional: Base64 Encoded Image>"
+}
+```
+
+---
+
+### **Request Body (Form Data)**
+
+When sending data as `multipart/form-data` (useful for file uploads like profile photos), include the following fields:
+
+| Key            | Value Type     | Description                                   |
+|-----------------|---------------|-----------------------------------------------|
+| `phone_number`  | String         | User's phone number in the format `+91XXXXXXXXXX`. |
+| `name`          | String         | User's full name.                            |
+| `role`          | String         | Role of the user (e.g., "EMPLOYEE").         |
+| `password`      | String         | User’s password.                             |
+| `profile_photo` | File (optional)| Profile photo of the user (image file).      |
+
+Example in **Postman**:
+1. Select `form-data` in the body.
+2. Add the fields mentioned above.
+3. Upload a file for the `profile_photo` field.
+
+---
+
+### **Response on Success**
+- **Status**: `201 Created`
+
+```json
+{
+  "success": true,
+  "message": "User registered successfully!",
+  "data": {
+    "id": 1,
+    "phone_number": "+911234567890",
+    "name": "John Doe",
+    "role": "EMPLOYEE",
+    "profile_photo": null
+  }
+}
+```
+
+---
+
+### **Response on Validation Error**
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "success": false,
+  "errors": {
+    "phone_number": ["Phone number must be in the format +911234567890."]
+  }
+}
+```
+
+---
+
+### **Response on Role Restriction Error**
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "success": false,
+  "errors": {
+    "role": ["You are not allowed to create this role."]
+  }
+}
+```
+
+---
+
+### **Response on Integrity Error**
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "success": false,
+  "errors": {
+    "phone_number": ["Phone number must be unique."]
+  }
+}
+```
+
