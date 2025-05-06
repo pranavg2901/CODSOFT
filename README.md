@@ -1,4 +1,4 @@
-<div style="text-align: center;">
+<div align="center">
   <img src="https://developguardindia.com/static/img/logo.png" alt="Company Logo" width="150">
   
   # **Develop Guard India Pvt. Ltd**
@@ -7,7 +7,7 @@
 </div>
 
 
-<div style="text-align: center;">
+<div align="center">
 
 | **Field**             | **Details**                    |
 |-----------------------|--------------------------------|
