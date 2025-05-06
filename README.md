@@ -6061,5 +6061,462 @@ The `Feedback` model is used to store feedback submitted by users. It tracks the
 
 ---
 
+# 🌐 Deployment Guide
+
+This document outlines the steps required to deploy and update your **Superstar Pest Control** application, including the backend (Django) and the admin panel (Vue.js). Follow these guidelines to ensure a smooth deployment process.
+
+---
+
+## 📋 Table of Contents
+1. [Server Configuration Details](#-server-configuration-details)
+2. [Backend Deployment (Django)](#-backend-deployment-django)
+3. [Admin Panel Deployment (Vue.js)](#-admin-panel-deployment-vuejs)
+4. [SSL Configuration](#-ssl-configuration)
+5. [Logs and Debugging](#-logs-and-debugging)
+
+---
+
+## 🖥️ Server Configuration Details
+
+- **Hosting Provider**: Hostinger VPS KVM2
+- **Operating System**: Ubuntu
+- **Web Server**: Apache2
+- **Application Server**: uWSGI
+- **Database**: MySQL
+- **Environment Variables**: Stored in `.env` file at `/var/www/BSS02/website/backend`
+- **Backend Domain**: `superstarpestcontrol.com`
+- **Admin Panel Domain**: `admin.superstarpestcontrol.com`
+- **SSL**: Configured using Certbot
+
+---
+
+## 🚀 Backend Deployment (Django)
+
+### 🗂️ Path Configuration
+- **Project Directory**: `/var/www/BSS02`
+- **Apache Configuration File**: `/etc/apache2/sites-available/superstarpestcontrol.com.conf`
+
+### 🛠️ Deployment Steps
+1. **Access the Server**:
+   ```bash
+   ssh bsapp@<your-server-ip>
+   cd /var/www/BSS02
+   ```
+
+2. **Reset and Pull Latest Code**:
+   ```bash
+   sudo git reset --hard
+   sudo git pull
+   ```
+   Enter your Git credentials when prompted.
+
+3. **Activate Virtual Environment**:
+   ```bash
+   source venv/bin/activate
+   ```
+
+4. **Run Database Migrations**:
+   ```bash
+   cd website/backend
+   python manage.py migrate
+   ```
+
+5. **Collect Static Files**:
+   ```bash
+   python manage.py collectstatic
+   ```
+
+6. **Check for Errors**:
+   ```bash
+   python manage.py runserver 0.0.0.0:8000
+   ```
+   - If the server starts without errors, press `Ctrl+C` to stop it.
+
+7. **Deactivate Virtual Environment**:
+   ```bash
+   deactivate
+   ```
+
+8. **Restart Apache**:
+   ```bash
+   sudo systemctl restart apache2
+   ```
+
+---
+
+## 🛠️ Admin Panel Deployment (Vue.js)
+
+### 🗂️ Path Configuration
+- **Project Directory**: `/var/www/BSS02`
+- **Apache Configuration File**: `/etc/apache2/sites-available/admin.superstarpestcontrol.com.conf`
+
+### 🛠️ Deployment Steps
+1. **Access the Server**:
+   ```bash
+   ssh bsapp@<your-server-ip>
+   cd /var/www/BSS02
+   ```
+
+2. **Pull Latest Code**:
+   ```bash
+   sudo git pull
+   ```
+   Enter your Git credentials when prompted.
+
+3. **Install Dependencies**:
+   ```bash
+   npm i
+   ```
+
+4. **Build the Application**:
+   ```bash
+   npm run install
+   ```
+
+5. **Copy `.htaccess`**:
+   ```bash
+   cp .htaccess ./dist
+   ```
+
+6. **Set Permissions**:
+   ```bash
+   sudo chown -R www-data:www-data /var/www/BSS02/admin_panel/dist
+   sudo chmod -R 755 /var/www/BSS02/admin_panel/dist
+   ```
+
+7. **Restart Apache**:
+   ```bash
+   sudo systemctl restart apache2
+   ```
+
+---
+
+## 🔒 SSL Configuration
+
+- **Certbot** is used for SSL certificates.
+- Both `superstarpestcontrol.com` and `admin.superstarpestcontrol.com` are configured with HTTPS.
+
+### Apache SSL Configuration for Backend (`superstarpestcontrol.com`):
+Located at:
+```bash
+/etc/apache2/sites-available/superstarpestcontrol.com.conf
+```
+
+### Apache SSL Configuration for Admin Panel (`admin.superstarpestcontrol.com`):
+Located at:
+```bash
+/etc/apache2/sites-available/admin.superstarpestcontrol.com.conf
+```
+
+---
+
+## 📜 Logs and Debugging
+
+### 🔍 Apache Logs
+- **Error Log**: `/var/log/apache2/superstarpestcontrol_error.log`
+- **Access Log**: `/var/log/apache2/superstarpestcontrol_access.log`
+
+### 🔍 Admin Panel Logs
+- **Error Log**: `/var/log/apache2/admin.superstarpestcontrol.com-error.log`
+- **Access Log**: `/var/log/apache2/admin.superstarpestcontrol.com-access.log`
+
+### 🔧 Checking Logs
+To view logs in real-time, use:
+```bash
+tail -f /var/log/apache2/<log-file>
+```
+
+---
+
+## 🔄 Post-Deployment Checklist
+
+1. Verify that the backend is accessible at `https://superstarpestcontrol.com`.
+2. Confirm that the admin panel is accessible at `https://admin.superstarpestcontrol.com`.
+3. Check for SSL certificates using:
+   ```bash
+   sudo certbot certificates
+   ```
+4. Test database migrations and static file collection.
+5. Monitor logs for potential errors.
+
+---
+
+This guide ensures that your deployment process is smooth and error-free. Feel free to enhance or modify it as needed! 🚀
+
+# 🔧 Third-Party Tools Documentation
+
+This document provides an overview of the third-party tools and services integrated with the **Superstar Pest Control** application. It includes account details, usage, and configuration instructions for each tool.
+
+---
+
+## 📋 Table of Contents
+1. [Razorpay](#razorpay)
+2. [SMTP Server](#smtp-server)
+3. [Twilio](#twilio)
+4. [Google Maps API](#google-maps-api)
+5. [Domain Management](#domain-management)
+
+---
+
+## 💳 Razorpay
+
+### 🛠️ Purpose
+Razorpay is used to handle payment processing for the application.
+
+### 🔑 Account Details
+- **Email**: `sanjaygavhane184@gmail.com`
+
+### 🛠️ Integration
+1. **API Keys**:
+   - Access your Razorpay dashboard at [Razorpay Dashboard](https://dashboard.razorpay.com/).
+   - Navigate to **Settings > API Keys**.
+   - Generate or retrieve the **Key ID** and **Key Secret**.
+
+2. **Django Configuration**:
+   Add the API keys to your `.env` file:
+   ```env
+   RAZORPAY_KEY_ID=your_key_id
+   RAZORPAY_KEY_SECRET=your_key_secret
+   ```
+
+3. **Usage**:
+   - The payment is initialized in the backend using the Razorpay Python SDK or REST API.
+   - Verify the payment signature after the transaction is completed.
+
+---
+
+## ✉️ SMTP Server
+
+### 🛠️ Purpose
+SMTP is used to send emails, such as booking confirmations, notifications, and support responses.
+
+### 🔑 Account Details
+- **Email**: `sanjaygavhane184@gmail.com`
+
+### 🛠️ Integration
+1. **SMTP Settings**:
+   - Host: `smtp.gmail.com`
+   - Port: `587`
+   - Username: `sanjaygavhane184@gmail.com`
+   - Password: Application-specific password (generated in Gmail account).
+
+2. **Django Configuration**:
+   Add the SMTP settings to your `.env` file:
+   ```env
+   EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+   EMAIL_HOST=smtp.gmail.com
+   EMAIL_PORT=587
+   EMAIL_USE_TLS=True
+   EMAIL_HOST_USER=sanjaygavhane184@gmail.com
+   EMAIL_HOST_PASSWORD=your_app_password
+   ```
+
+3. **Usage**:
+   - Use Django's `send_mail` or `EmailMessage` for sending emails.
+   - Test the email functionality using:
+     ```bash
+     python manage.py shell
+     ```
+     ```python
+     from django.core.mail import send_mail
+     send_mail('Test Subject', 'Test Message', 'sanjaygavhane184@gmail.com', ['recipient@example.com'])
+     ```
+
+---
+
+## 📞 Twilio
+
+### 🛠️ Purpose
+Twilio is used for sending SMS notifications to customers.
+
+### 🔑 Account Details
+- **Account Name**: Beginning Solutions
+- **Email**: `aagavhane184@gmail.com`
+- **Note**: This account may change in the future.
+
+### 🛠️ Integration
+1. **API Credentials**:
+   - Access your Twilio dashboard at [Twilio Dashboard](https://www.twilio.com/console).
+   - Retrieve the **Account SID**, **Auth Token**, and **Phone Number**.
+
+2. **Django Configuration**:
+   Add the Twilio settings to your `.env` file:
+   ```env
+   TWILIO_ACCOUNT_SID=your_account_sid
+   TWILIO_AUTH_TOKEN=your_auth_token
+   TWILIO_PHONE_NUMBER=your_twilio_number
+   ```
+
+3. **Usage**:
+   - Use the Twilio Python SDK to send SMS notifications:
+     ```python
+     from twilio.rest import Client
+
+     client = Client('your_account_sid', 'your_auth_token')
+     message = client.messages.create(
+         body="Your booking has been confirmed!",
+         from_="your_twilio_number",
+         to="+91xxxxxxxxxx"
+     )
+     print(message.sid)
+     ```
+
+---
+
+## 🗺️ Google Maps API
+
+### 🛠️ Purpose
+Google Maps API is used for geolocation and mapping services, such as retrieving latitude and longitude for customer addresses.
+
+### 🔑 Account Details
+- **API Key**: Generated from **Google Cloud Platform**.
+
+### 🛠️ Integration
+1. **Generate API Key**:
+   - Log in to [Google Cloud Platform](https://console.cloud.google.com/).
+   - Navigate to **APIs & Services > Credentials**.
+   - Create a new API Key and restrict it to your domain (`superstarpestcontrol.com`).
+
+2. **Django Configuration**:
+   Add the API key to your `.env` file:
+   ```env
+   GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+   ```
+
+3. **Usage**:
+   - Use the Google Maps API for geocoding or embedding maps:
+     ```python
+     import requests
+
+     address = "Your customer address"
+     api_key = "your_google_maps_api_key"
+     response = requests.get(f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={api_key}")
+     data = response.json()
+     print(data)
+     ```
+
+---
+
+## 🌐 Domain Management
+
+### 🛠️ Purpose
+The domain is managed by Hostinger and points to the VPS server for both the backend and admin panel.
+
+### 🔑 Account Details
+- **Domain Registrar**: Hostinger
+- **Domain**:
+  - Backend: `superstarpestcontrol.com`
+  - Admin Panel: `admin.superstarpestcontrol.com`
+
+### 🛠️ Integration
+1. **DNS Configuration**:
+   - Log in to [Hostinger Control Panel](https://www.hostinger.in/).
+   - Navigate to **DNS Zone** and configure the **A Record** to point to your server's IP.
+
+2. **SSL Configuration**:
+   - Use Certbot to generate SSL certificates for both domains:
+     ```bash
+     sudo certbot --apache
+     ```
+
+3. **Apache Configuration**:
+   - Ensure the corresponding `.conf` files are properly set up to handle HTTPS requests (as detailed in the deployment guide).
+
+---
+
+## 🔄 Post-Integration Checklist
+
+1. **Razorpay**:
+   - Verify payment processing with test keys and live keys.
+2. **SMTP**:
+   - Send a test email to confirm the email server is working correctly.
+3. **Twilio**:
+   - Test SMS delivery to ensure proper integration.
+4. **Google Maps API**:
+   - Validate geocoding functionality for customer addresses.
+5. **Domain**:
+   - Ensure both domains (`superstarpestcontrol.com` and `admin.superstarpestcontrol.com`) are accessible over HTTPS.
+---
 
 
+# 📚 References
+
+This section provides links to the repositories, documentation, and resources that were used or referred to during the development and deployment of the **Superstar Pest Control** application.
+
+---
+
+## 🔗 Project Repository
+- **Backend Repository**:  
+  [GitHub: Beginning-co-in/BSS02](https://github.com/Beginning-co-in/BSS02)
+
+---
+
+## 📘 Documentation & Resources
+
+### 🐍 Python
+- **Python Documentation**:  
+  [https://docs.python.org/](https://docs.python.org/)
+
+### 🛢️ MySQL
+- **MySQL Official Website**:  
+  [https://www.mysql.com](https://www.mysql.com)
+
+### 🌐 Django
+- **Django Documentation**:  
+  [https://docs.djangoproject.com/](https://docs.djangoproject.com/)
+
+### 💳 Razorpay
+- **Razorpay API Documentation**:  
+  [https://razorpay.com/docs/api/](https://razorpay.com/docs/api/)
+
+### ✉️ SMTP
+- **Gmail SMTP Configuration**:  
+  [https://support.google.com/mail/answer/7126229](https://support.google.com/mail/answer/7126229)
+
+### 📞 Twilio
+- **Twilio API Documentation**:  
+  [https://www.twilio.com/docs](https://www.twilio.com/docs)
+
+### 🗺️ Google Maps API
+- **Google Maps API Documentation**:  
+  [https://developers.google.com/maps/documentation/](https://developers.google.com/maps/documentation/)
+
+### 🌐 Apache
+- **Apache HTTP Server Documentation**:  
+  [https://httpd.apache.org/docs/](https://httpd.apache.org/docs/)
+
+### 🔒 Certbot
+- **Certbot Documentation**:  
+  [https://certbot.eff.org/](https://certbot.eff.org/)
+
+### 🛠️ Hostinger
+- **Hostinger Control Panel Documentation**:  
+  [https://www.hostinger.in/tutorials/](https://www.hostinger.in/tutorials/)
+
+---
+## 🎉 Conclusion
+
+This guide has been designed to provide a comprehensive walkthrough for the deployment, integration, and management of the **Superstar Pest Control** application. With a focus on clarity and precision, we have covered all essential topics, including server configuration, third-party tool integrations, SSL setup, and deployment processes for both the backend and admin panel.
+
+By following this documentation, you can:
+- Efficiently deploy your application on a production-ready VPS server.
+- Seamlessly integrate third-party services like Razorpay, SMTP, Twilio, and Google Maps API.
+- Manage domains and SSL certificates for secure and reliable access.
+- Debug and monitor your application using Apache logs and other tools.
+
+This documentation ensures that even complex tasks like server management and application updates are simplified into actionable steps. Whether you are a developer, a system administrator, or a business stakeholder, this guide is your one-stop resource for deploying and maintaining the Superstar Pest Control platform with confidence.
+
+We hope this documentation serves as a valuable resource for your team and ensures smooth operations for your application. Our goal is to empower you to focus on what truly matters—delivering exceptional pest control services to your customers.
+
+Thank you for being part of the **Superstar Pest Control** journey!
+
+---
+
+### 📌 Footer
+
+For more information, help, or to report any issues:
+- **Support Email**: support@superstarpestcontrol.com  
+- **GitHub Repository**: [BSS02 Project](https://github.com/Beginning-co-in/BSS02)  
+- **Documentation Maintainer**: Beginning Solutions (https://beginningsolutions.in)
+
+© 2025 Superstar Pest Control | **Version 1.0** | All Rights Reserved
