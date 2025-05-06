@@ -712,3 +712,67 @@ Below are some of the key dependencies used in the backend:
 ## ⚙️ Installation and Setup
 
 Refer to the [Installation and Setup](#installation-and-setup) section for detailed instructions on how to set up and run the backend.
+
+# 🛠 Admin Panel Frontend Documentation
+
+This document provides a comprehensive guide to the **Admin Panel Frontend** of **Super Star Pest Control Services**. The Admin Panel is designed to help administrators manage services, bookings, customer interactions, and employees efficiently. Below is the structured documentation of the frontend aspects of the Admin Panel.
+
+
+# 📚 API Documentation
+
+This document provides a detailed guide for the APIs of **Super Star Pest Control Services**. It includes information about each endpoint, how to run the APIs, and how to test them using tools like Postman.
+
+---
+
+## 🔰 Introduction
+
+The API is designed to provide a seamless backend for managing services, bookings, employees, and more. It is built using **Django Rest Framework (DRF)** and follows RESTful principles.
+
+### **Key Features**
+- **Authentication**: All endpoints require authentication using JWT tokens.
+- **CRUD Operations**: Create, Read, Update, and Delete resources like services, bookings, and employees.
+- **Integration**: APIs for RazorPay, email notifications, and Google Maps.
+
+---
+
+## 🚀 How to Run the API
+
+1. **Start the Development Server**:
+   Run the following command to start the Django development server:
+   ```bash
+   python manage.py runserver
+   ```
+
+2. **Base URL**:
+   The API is accessible at:
+   ```
+   http://127.0.0.1:8000/api/
+   ```
+
+3. **Authentication**:
+   - Authentication is handled using **JWT Tokens**.
+   - Obtain a token by logging in via the `/auth/login/` endpoint.
+   - Include the token in the `Authorization` header for all requests:
+     ```
+     Authorization: Bearer <token>
+     ```
+
+---
+
+## 🛠 Testing the API
+
+You can test the API using tools like **Postman** or **cURL**.
+
+### **Using Postman**
+1. Import the API endpoints into Postman manually or via a collection file.
+2. Add the required headers (e.g., `Authorization`) for testing protected endpoints.
+3. Send requests to the API and verify the responses.
+
+### **Using cURL**
+Example cURL command for testing an endpoint:
+```bash
+curl -X GET http://127.0.0.1:8000/api/bookings/ \
+-H "Authorization: Bearer <token>"
+```
+
+---
