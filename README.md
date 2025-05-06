@@ -1904,3 +1904,1936 @@ If the request is made without a valid token:
 
 ---
 
+### **12. Available Employees**
+
+#### **12.1 Get Available Employees**
+- **URL**: `/available-employees/`
+- **Method**: `GET`
+- **Authentication**: Required (Bearer Token)
+- **Description**: Retrieves a list of available employees for a specific booking, excluding those who are busy during the requested time range.
+
+##### **Headers**
+```json
+{
+  "Authorization": "Bearer <token>"
+}
+```
+
+---
+
+### **Query Parameters**
+
+| Parameter     | Type   | Description                           |
+|---------------|--------|---------------------------------------|
+| `booking_id`  | Integer| **Required**. The ID of the booking to check for employee availability. |
+
+---
+
+### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+[
+  {
+    "id": 1,
+    "user": {
+      "id": 5,
+      "phone_number": "+911234567890",
+      "name": "John Employee",
+      "role": "EMPLOYEE",
+      "profile_photo": "http://example.com/media/profile_photos/employee.jpg"
+    },
+    "is_available": true
+  },
+  {
+    "id": 2,
+    "user": {
+      "id": 6,
+      "phone_number": "+911234567891",
+      "name": "Jane Employee",
+      "role": "EMPLOYEE",
+      "profile_photo": "http://example.com/media/profile_photos/employee2.jpg"
+    },
+    "is_available": true
+  }
+]
+```
+
+---
+
+### **Response on Missing Booking ID**
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "detail": "Booking ID is required"
+}
+```
+
+---
+
+### **Response on Non-Existent Booking**
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "detail": "Booking not found"
+}
+```
+
+---
+
+### **Response on Unauthorized Access**
+If the request is made without a valid token:
+- **Status**: `401 Unauthorized`
+
+```json
+{
+  "detail": "Authentication credentials were not provided."
+}
+```
+
+---
+
+### **13. Booking Management**
+
+#### **13.1 Booking Flow (Admin Panel)**
+The following steps outline the flow for creating or managing bookings from the **Admin Panel**:
+
+1. **Create a Booking**
+   - Navigate to the Admin Panel.
+   - Fill in the required booking details:
+     - **Full Name**: The client's name.
+     - **Email**: The client's email address.
+     - **Phone Number**: Must be in the format `+91XXXXXXXXXX` (13 digits).
+     - **Address**: The service address.
+     - **Service Name**: The name of the service (e.g., "General Pest Control").
+     - **Booking Date and Time**: Specify when the service is requested.
+     - **Price**: Enter the base price for the service.
+   - Submit the form. The system will:
+     - Automatically calculate **GST**, **Payment Gateway Charges**, and the **Grand Total**.
+     - Set the booking **status** based on the service and price.
+     - Validate mandatory fields (e.g., `Plan`, `Property Type`, etc., for specific services).
+
+2. **View Bookings**
+   - Access the list of all bookings in the Admin Panel.
+   - Filter bookings by:
+     - Status (`Pending`, `Inspection Assigned`, etc.)
+     - Date Range
+     - Client Name or Phone Number
+   - Click on a booking to view its details.
+
+3. **Update Booking**
+   - Open a specific booking.
+   - Modify fields such as:
+     - **Status**: Update to `Inspection Assigned`, `Work Assigned`, or `Service Completed` based on progress.
+     - **Price**: Adjust the price if required.
+   - Submit changes. The system will:
+     - Update the **Grand Total** automatically.
+     - Mark employees as available if the status changes to `Service Completed`.
+
+4. **Delete Booking**
+   - Select a booking to delete.
+   - Confirm the deletion. This action is restricted to `Superuser`, `Admin`, or `Manager` roles.
+
+5. **Generate Payment Link**
+   - Open a booking.
+   - Enter the price and click "Generate Payment Link".
+   - The system will:
+     - Calculate the **Grand Total**.
+     - Generate a secure payment link using the booking's `Secure Token`.
+     - Send the link to the client's registered phone number via SMS.
+
+6. **View Service History**
+   - Open a booking.
+   - View the list of employees assigned to the booking and their service timelines.
+
+7. **Reports and Analytics**
+   - Access reports to view:
+     - Total bookings by status.
+     - Revenue generated.
+     - Employee performance metrics.
+
+---
+
+#### **13.2 Booking View**
+
+- **URL**: `/bookings/`
+- **Method**: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`
+- **Authentication**: Required (Bearer Token)
+- **Description**: Provides CRUD operations for managing bookings. Includes additional actions for service history and payment link generation.
+
+##### **Headers**
+```json
+{
+  "Authorization": "Bearer <token>"
+}
+```
+
+---
+
+### **GET: Retrieve All Bookings**
+Retrieves a list of all bookings, ordered by their IDs in descending order.
+
+#### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+[
+  {
+    "id": 1,
+    "full_name": "John Doe",
+    "email": "john.doe@example.com",
+    "phone_number": "+911234567890",
+    "address": "123 Main St, City",
+    "service_name": "General Pest Control",
+    "booking_date": "2025-05-01",
+    "booking_time": "10:00:00",
+    "price": 5000.00,
+    "gst": 900.00,
+    "payment_gateway_charges": 130.00,
+    "grand_total": 6030.00,
+    "payment_status": false,
+    "status": "PENDING",
+    "secure_token": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+    "created_at": "2025-05-01T10:00:00Z"
+  }
+]
+```
+
+---
+
+### **POST: Create a New Booking**
+Allows the creation of a new booking.
+
+#### **Request Body (JSON Format)**
+
+```json
+{
+  "full_name": "Jane Smith",
+  "email": "jane.smith@example.com",
+  "phone_number": "+911234567891",
+  "address": "456 Elm St, City",
+  "service_name": "Honey Bees Control",
+  "booking_date": "2025-05-10",
+  "booking_time": "14:00:00",
+  "price": 12000
+}
+```
+
+#### **Response on Success**
+- **Status**: `201 Created`
+
+```json
+{
+  "id": 2,
+  "full_name": "Jane Smith",
+  "email": "jane.smith@example.com",
+  "phone_number": "+911234567891",
+  "address": "456 Elm St, City",
+  "service_name": "Honey Bees Control",
+  "booking_date": "2025-05-10",
+  "booking_time": "14:00:00",
+  "price": 12000.00,
+  "gst": 2160.00,
+  "payment_gateway_charges": 312.00,
+  "grand_total": 14472.00,
+  "payment_status": false,
+  "status": "PENDING",
+  "secure_token": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+  "created_at": "2025-05-06T06:37:15Z"
+}
+```
+
+#### **Response on Validation Error**
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "error": "An error occurred while creating the booking",
+  "details": {
+    "phone_number": ["Phone number must be in format +91XXXXXXXXXX (13 digits)."]
+  }
+}
+```
+
+---
+
+### **PUT/PATCH: Update a Booking**
+Allows updating all fields of an existing booking. Restricted to `SUPERUSER`, `ADMIN`, and `MANAGER`.
+
+#### **Request Body (JSON Format)**
+
+```json
+{
+  "status": "SERVICE_COMPLETED",
+  "price": 15000
+}
+```
+
+#### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+{
+  "id": 2,
+  "full_name": "Jane Smith",
+  "email": "jane.smith@example.com",
+  "phone_number": "+911234567891",
+  "address": "456 Elm St, City",
+  "service_name": "Honey Bees Control",
+  "booking_date": "2025-05-10",
+  "booking_time": "14:00:00",
+  "price": 15000.00,
+  "gst": 2700.00,
+  "payment_gateway_charges": 390.00,
+  "grand_total": 18090.00,
+  "payment_status": false,
+  "status": "SERVICE_COMPLETED",
+  "secure_token": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+  "created_at": "2025-05-06T06:37:15Z"
+}
+```
+
+---
+
+### **DELETE: Delete a Booking**
+Allows deletion of a booking. Restricted to `SUPERUSER`, `ADMIN`, and `MANAGER`.
+
+#### **Response on Success**
+- **Status**: `204 No Content`
+
+---
+
+### **Additional Actions**
+
+#### **13.2 Service History**
+- **URL**: `/bookings/{id}/service_history/`
+- **Method**: `GET`
+- **Description**: Retrieves the service history for a specific booking.
+
+---
+
+#### **13.3 Generate Payment Link**
+- **URL**: `/bookings/{id}/generate_payment_link/`
+- **Method**: `POST`
+- **Description**: Generates a payment link for a specific booking and sends it to the client's phone number.
+
+---
+
+### **Response on Unauthorized Access**
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "error": "Unauthorized",
+  "message": "You don't have permission to perform this action."
+}
+```
+
+---
+
+### **14. Booking Flow for Website (Frontend Integration)**
+
+#### **14.1 Save Booking (API Binding with HTML/JS)**
+This API route is used by the website to handle booking submissions via JavaScript and HTML forms. The route processes booking details, calculates GST and other charges, saves the booking to the database, and sends the response back to the frontend.
+
+---
+
+### **Route Details**
+
+#### **URL**: `/save_booking/`
+#### **Method**: `POST`
+#### **Authentication**: Not required for website users.
+#### **Description**: Handles booking submissions from the website's frontend. The same flow is used for booking offers by reusing the booking details.
+
+---
+
+### **Frontend Binding**
+
+The booking form is integrated in the `booking_form.html` file with JavaScript API calls to the `/save_booking/` endpoint. 
+- The form collects the following details:
+  - Personal Information: Full name, email, phone number.
+  - Address Information: Address, latitude, longitude, zipcode.
+  - Service Details: Service name, plan, property type, house condition, location.
+  - Booking Date and Time.
+  - Price and Offer Name.
+
+---
+
+### **Request Body (JSON Format)**
+
+```json
+{
+  "full_name": "John Doe",
+  "email": "john.doe@example.com",
+  "phone_number": "+911234567890",
+  "address": "123 Main St, City",
+  "latitude": 19.0330,
+  "longitude": 73.0297,
+  "zipcode": "400001",
+  "service_name": "General Pest Control",
+  "plan": "Annual Package 03 Services",
+  "property_type": "Residential",
+  "house_condition": "Good",
+  "location": "Mumbai",
+  "booking_date": "2025-05-10",
+  "booking_time": "14:00:00",
+  "price": 12000,
+  "offer_name": "Summer Discount"
+}
+```
+
+---
+
+### **Backend Workflow**
+
+1. **Price Handling**:
+   - If the price is `"As per condition"`, it defaults to `0`.
+   - Otherwise, it is converted to a float.
+
+2. **Charge Calculations**:
+   - **GST (18%)**: `price * 0.18`
+   - **Payment Gateway Charges (2.6%)**: `price * 0.026`
+   - **Grand Total**: `price + gst + payment_gateway_charges`
+
+3. **Save Booking**:
+   - A new `Booking` object is created and saved with the provided details.
+
+4. **Optional Notifications**:
+   - **Thank You SMS**: Sent to the user's phone number (currently commented out).
+   - **Booking Details to Owner**: Sent to the admin or owner (currently commented out).
+
+5. **Return Response**:
+   - Returns the booking details including calculated charges back to the frontend.
+
+---
+
+### **Response on Success**
+- **Status**: `201 Created`
+
+```json
+{
+  "message": "Booking saved successfully!",
+  "booking_id": 1,
+  "full_name": "John Doe",
+  "email": "john.doe@example.com",
+  "phone_number": "+911234567890",
+  "address": "123 Main St, City",
+  "latitude": 19.0330,
+  "longitude": 73.0297,
+  "zipcode": "400001",
+  "service_name": "General Pest Control",
+  "plan": "Annual Package 03 Services",
+  "property_type": "Residential",
+  "house_condition": "Good",
+  "location": "Mumbai",
+  "booking_date": "2025-05-10",
+  "booking_time": "14:00:00",
+  "price": 12000,
+  "offer_name": "Summer Discount",
+  "gst": 2160.00,
+  "payment_gateway_charges": 312.00,
+  "grand_total": 14472.00
+}
+```
+
+---
+
+### **Response on Invalid Request**
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "error": "Invalid request"
+}
+```
+
+---
+
+### **14.2 Notes on Offer Integration**
+
+- **Shared Flow**: The offer booking follows the **same flow** as the regular booking. It uses the same `/save_booking/` route and passes the offer details in the `offer_name` field.
+- **Offer Validation**: 
+  - The system checks if the `offer_name` exists and is active.
+  - If invalid, the `offer_applied` field defaults to `false` and the required fields (e.g., `plan`, `property_type`, etc.) are validated.
+
+---
+
+
+
+---
+
+### **Frontend File Reference**
+- **Filename**: `booking_form.html`
+- **Purpose**: Contains the HTML and JavaScript code for the booking form and API integration.
+
+---
+### **15. Get Booking Details**
+
+#### **15.1 Fetch Booking Details by ID**
+This endpoint retrieves the details of a booking based on its unique `booking_id`. It calculates GST, Payment Gateway Charges, and Grand Total dynamically before returning the data.
+
+---
+
+### **Route Details**
+
+#### **URL**: `/get-booking-details/<int:booking_id>/`
+#### **Method**: `GET`
+#### **Authentication**: Not required.
+#### **Description**: Fetches booking details from the database using the provided `booking_id`.
+
+---
+
+### **Details of API Workflow**
+
+1. **Fetch Booking**:
+   - Uses the `booking_id` to retrieve the booking from the database using `get_object_or_404`.
+   - If the booking does not exist, a 404 error is returned.
+
+2. **Calculate Charges**:
+   - **GST (18%)**: `price * 0.18`
+   - **Payment Gateway Charges (2.6%)**: `price * 0.026`
+   - **Grand Total**: Sum of `price`, `GST`, and `Payment Gateway Charges`.
+
+3. **Return Data**:
+   - Converts the `Decimal` values for price and charges into `float` for JSON compatibility.
+   - Returns all booking details and calculated values in the response.
+
+---
+
+### **Request Example**
+
+#### **GET**
+```
+/get-booking-details/1/
+```
+
+---
+
+### **Response on Success**
+- **Status**: `200 OK`
+
+```json
+{
+  "booking_id": 1,
+  "full_name": "John Doe",
+  "email": "john.doe@example.com",
+  "phone_number": "+911234567890",
+  "address": "123 Main St, City",
+  "latitude": 19.033,
+  "longitude": 73.0297,
+  "zipcode": "400001",
+  "service_name": "General Pest Control",
+  "plan": "Annual Package 03 Services",
+  "property_type": "Residential",
+  "house_condition": "Good",
+  "location": "Mumbai",
+  "Payment_Status": false,
+  "booking_date": "2025-05-10",
+  "booking_time": "14:00:00",
+  "price": 12000.00,
+  "gst": 2160.00,
+  "payment_gateway_charges": 312.00,
+  "grand_total": 14472.00
+}
+```
+
+---
+
+### **Response on Booking Not Found**
+- **Status**: `404 Not Found`
+
+```json
+{
+  "detail": "Not Found"
+}
+```
+
+---
+
+### **Notes**
+- This endpoint is useful for both admin panels and website integrations where detailed booking information is required.
+- Calculations for GST and Payment Gateway Charges ensure that the latest values are always returned with the booking details.
+
+
+### **16. Offer Management (Admin Panel)**
+
+#### **16.1 Offer View**
+This endpoint provides CRUD operations for managing offers, including creating, updating, and deleting offers. The status and discount price of offers are automatically calculated based on the provided data.
+
+---
+
+### **Route Details**
+
+#### **URL**: `/offers/`
+#### **Method**: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`
+#### **Authentication**: 
+- **Required for Create, Update, and Delete**: Only accessible by `Superuser`, `Admin`, or `Manager`.
+- **Optional for Read**: Any user can view the offers.
+
+#### **Description**: 
+- For creating and managing offers through the Admin Panel.
+- Automatically calculates `discount_price` and updates the `status` (`ACTIVE` or `EXPIRED`) based on the provided `end_date`.
+
+---
+
+### **Endpoints and Methods**
+
+#### **Endpoint**: `/offers/`
+- **GET**: List all offers.
+- **POST**: Create a new offer.
+
+#### **Endpoint**: `/offers/<id>/`
+- **GET**: Retrieve a specific offer by ID.
+- **PUT/PATCH**: Update an existing offer.
+- **DELETE**: Delete an offer (and its associated image file).
+
+---
+
+### **Request Body (Create and Update)**
+
+#### **Create Offer (POST)**:
+```json
+{
+  "title": "Summer Discount",
+  "description": "Get 20% off on all pest control services.",
+  "price": 1000,
+  "discount": 20,
+  "start_date": "2025-05-01",
+  "end_date": "2025-05-31",
+  "service_name": ["General Pest Control", "Bed Bugs Control"],
+  "offer_banner": "<file>"
+}
+```
+
+#### **Update Offer (PUT/PATCH)**:
+```json
+{
+  "title": "Updated Summer Discount",
+  "description": "Get 25% off on all pest control services.",
+  "discount": 25,
+  "end_date": "2025-06-15",
+  "service_name": ["General Pest Control", "Anti Termite Treatment"]
+}
+```
+
+---
+
+### **Response Examples**
+
+#### **Response on Success (Create or Update)**:
+- **Status**: `201 Created` (for POST), `200 OK` (for PUT/PATCH)
+
+```json
+{
+  "id": 1,
+  "title": "Summer Discount",
+  "description": "Get 20% off on all pest control services.",
+  "price": 1000,
+  "discount": 20,
+  "discount_price": 800.0,
+  "start_date": "2025-05-01",
+  "end_date": "2025-05-31",
+  "status": "ACTIVE",
+  "services": ["General Pest Control", "Bed Bugs Control"],
+  "offer_banner": "http://example.com/media/offers/summer_discount.jpg"
+}
+```
+
+#### **Response on Offer Deletion**:
+- **Status**: `204 No Content`
+
+```json
+{
+  "message": "Offer and associated image deleted successfully."
+}
+```
+
+#### **Response on Validation Error**:
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "error": "Validation failed",
+  "message": {
+    "discount": ["Ensure this value is less than or equal to 100."]
+  }
+}
+```
+
+#### **Response on Unauthorized Access**:
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "error": "Unauthorized",
+  "message": "You do not have permission to perform this action."
+}
+```
+
+---
+
+### **16.2 Backend Workflow**
+
+#### **1. Offer Creation**:
+- **Discount Price Calculation**: `price - (price * discount / 100)`
+- **Status Calculation**:
+  - `ACTIVE` if `end_date` is in the future.
+  - `EXPIRED` if `end_date` has passed.
+- **Services**: Maps `service_name` to the `services` field.
+
+#### **2. Offer Update**:
+- Recalculates `discount_price` and `status` when updated.
+- Deletes the old image file if a new image is uploaded.
+
+#### **3. Offer Deletion**:
+- Deletes the offer and its associated banner image file (if exists).
+
+---
+
+### **16.3 Permissions**
+
+| Action                | Roles Allowed              |
+|-----------------------|----------------------------|
+| **Create**            | `Superuser`, `Admin`, `Manager` |
+| **Update**            | `Superuser`, `Admin`, `Manager` |
+| **Delete**            | `Superuser`, `Admin`, `Manager` |
+| **Read**              | All users                 |
+
+---
+
+### **16.4 Notes**
+
+- **Image Handling**:
+  - Old images are deleted when a new image is uploaded during an update.
+  - Attempting to delete the image file during offer deletion is optional (logs warnings if it fails).
+
+- **Service Choices**:
+  - The `service_name` field accepts a list of predefined service choices available in `Offer.SERVICE_CHOICES`.
+
+
+### **17. Razorpay Payment Integration**
+
+#### **17.1 Overview**
+These endpoints handle Razorpay payment integration and are directly connected to the booking form on the website. They allow the creation of Razorpay payment orders and verification of payments after the user completes the transaction.
+
+---
+
+### **Endpoints**
+
+#### **1. Create Razorpay Order**
+- **URL**: `/create-order/<int:booking_id>/`
+- **Method**: `POST`
+- **Authentication**: Not required.
+- **Description**: Creates a Razorpay payment order for the specified booking. If an existing order for the booking is pending, it will return the existing order instead of creating a new one.
+
+---
+
+#### **2. Verify Payment**
+- **URL**: `/verify-payment/`
+- **Method**: `POST`
+- **Authentication**: Not required.
+- **Description**: Verifies the payment response from Razorpay and updates the payment and booking status accordingly.
+
+---
+
+### **Detailed Workflow**
+
+#### **17.2 Create Razorpay Order**
+
+1. **Request**:
+   - The `booking_id` is passed in the URL.
+   - The endpoint checks if a pending payment order already exists for the booking.
+   - If an existing order is found:
+     - Returns the existing Razorpay order details.
+   - If no existing order:
+     - Creates a new Razorpay order using the Razorpay API.
+     - Saves the order details in the `Payment` model.
+
+2. **Response on Success (Existing Order)**:
+   - **Status**: `200 OK`
+
+```json
+{
+  "order_id": "order_123abc456",
+  "amount": 14472.00,
+  "key": "rzp_test_abc123xyz",
+  "message": "Using existing order"
+}
+```
+
+3. **Response on Success (New Order)**:
+   - **Status**: `201 Created`
+
+```json
+{
+  "order_id": "order_789xyz123",
+  "amount": 14472.00,
+  "key": "rzp_test_abc123xyz",
+  "message": "New order created"
+}
+```
+
+4. **Response on Error**:
+   - **Status**: `500 Internal Server Error`
+
+```json
+{
+  "error": "Error message describing the issue"
+}
+```
+
+---
+
+#### **17.3 Verify Payment**
+
+1. **Request**:
+   - The payment details are sent in the request body:
+     - `razorpay_order_id`: The Razorpay order ID.
+     - `razorpay_payment_id`: The Razorpay payment ID.
+     - `razorpay_signature`: The payment signature for verification.
+
+2. **Workflow**:
+   - Fetches the `Payment` object using the `razorpay_order_id`.
+   - Verifies the payment signature using the Razorpay SDK.
+   - If verification succeeds:
+     - Updates the `Payment` status to `SUCCESS`.
+     - Marks the associated booking's `payment_status` as `True`.
+     - Sends a payment success SMS to the client.
+     - Allows access to the "Thank You" page by setting a session flag.
+   - If verification fails:
+     - Updates the `Payment` status to `FAILED`.
+
+3. **Response on Payment Success**:
+   - **Status**: `200 OK`
+
+```json
+{
+  "message": "Payment successful",
+  "status": "SUCCESS"
+}
+```
+
+4. **Response on Payment Verification Failure**:
+   - **Status**: `400 Bad Request`
+
+```json
+{
+  "message": "Payment verification failed",
+  "status": "FAILED"
+}
+```
+
+5. **Response on Invalid Order ID**:
+   - **Status**: `400 Bad Request`
+
+```json
+{
+  "message": "Invalid order ID"
+}
+```
+
+6. **Response on Invalid Request**:
+   - **Status**: `400 Bad Request`
+
+```json
+{
+  "error": "Invalid request"
+}
+```
+
+---
+
+### **17.4 Notes**
+
+- **API Key**: The Razorpay API key is returned in the response to enable the frontend to initiate the Razorpay payment interface.
+- **Amount Conversion**:
+  - The amount is converted to paise (multiplied by 100) when creating the Razorpay order, as required by Razorpay.
+- **Session Management**:
+  - A session flag (`payment_verified`) is set after successful payment verification to allow access to the "Thank You" page.
+
+
+### **18. Razorpay Payment Integration (From Payment Link)**
+
+#### **18.1 Overview**
+These endpoints manage Razorpay payment integration for clients using payment links (e.g., offers or booking payment links). They allow the creation of Razorpay payment orders and the verification of payments initiated via these links.
+
+---
+
+### **Endpoints**
+
+#### **1. Generate Razorpay Payment Order**
+- **URL**: `/create-payment-order-link/<int:booking_id>/`
+- **Method**: `GET`
+- **Authentication**: Not required.
+- **Description**: Creates or retrieves a Razorpay payment order for the specified booking, ensuring the client can proceed with payment.
+
+#### **2. Verify Razorpay Payment**
+- **URL**: `/verify-payment-link/`
+- **Method**: `POST`
+- **Authentication**: Not required.
+- **Description**: Verifies the Razorpay payment response and updates the payment and booking status accordingly.
+
+---
+
+### **Detailed Workflow**
+
+#### **18.2 Generate Razorpay Payment Order**
+
+1. **Request**:
+   - The `booking_id` is passed in the URL.
+   - The endpoint checks if a payment record already exists for the booking:
+     - If it exists and includes a Razorpay order ID, the existing order is returned.
+     - If it exists but no order ID is present, a new Razorpay order is created.
+
+2. **Razorpay Order Creation**:
+   - The `grand_total` of the booking is converted to paise (multiplied by 100) since Razorpay operates in paise.
+   - A new Razorpay order is created using the Razorpay API and the details are saved in the `Payment` model.
+
+3. **Response on Success**:
+   - **Status**: `200 OK`
+
+```json
+{
+  "success": true,
+  "key": "rzp_test_abc123xyz",
+  "amount": 1447200,
+  "currency": "INR",
+  "name": "Your Company Name",
+  "description": "Payment for Booking 1",
+  "order_id": "order_123abc456"
+}
+```
+
+4. **Response on Booking Not Found**:
+   - **Status**: `404 Not Found`
+
+```json
+{
+  "success": false,
+  "error": "Booking not found"
+}
+```
+
+5. **Response on Other Errors**:
+   - **Status**: `500 Internal Server Error`
+
+```json
+{
+  "success": false,
+  "error": "Error message describing the issue"
+}
+```
+
+---
+
+#### **18.3 Verify Razorpay Payment**
+
+1. **Request**:
+   - The payment details are included in the request body:
+     - `razorpay_order_id`: The Razorpay order ID.
+     - `razorpay_payment_id`: The Razorpay payment ID.
+     - `razorpay_signature`: The payment signature for verification.
+     - `booking_id`: The associated booking ID.
+
+2. **Workflow**:
+   - Fetches the `Payment` object using the `razorpay_order_id`.
+   - Verifies the payment signature using the Razorpay SDK.
+   - If verification succeeds:
+     - Updates the `Payment` status to `SUCCESS`.
+     - Marks the associated booking's `payment_status` as `True`.
+     - Updates the booking's `status` to `INSPECTION_ASSIGNED`.
+     - Sends a payment success SMS to the client.
+   - If verification fails:
+     - Updates the `Payment` status to `FAILED`.
+
+3. **Response on Payment Success**:
+   - **Status**: `200 OK`
+
+```json
+{
+  "success": true
+}
+```
+
+4. **Response on Payment Verification Failure**:
+   - **Status**: `400 Bad Request`
+
+```json
+{
+  "success": false,
+  "message": "Signature verification failed"
+}
+```
+
+5. **Response on Invalid Order ID**:
+   - **Status**: `400 Bad Request`
+
+```json
+{
+  "success": false,
+  "message": "Invalid Order ID"
+}
+```
+
+6. **Response on Invalid Request**:
+   - **Status**: `400 Bad Request`
+
+```json
+{
+  "success": false,
+  "message": "Invalid request"
+}
+```
+
+---
+
+### **18.4 Notes**
+
+- **API Key**: The Razorpay API key is returned in the response to enable the frontend to initiate the Razorpay payment interface.
+- **Amount Conversion**:
+  - The amount is converted to paise (multiplied by 100) when creating the Razorpay order, as required by Razorpay.
+- **Booking Status Update**:
+  - After successful payment verification, the associated booking's status is updated to `INSPECTION_ASSIGNED`.
+- **Session Management**:
+  - This flow is designed for clients accessing the payment link directly.
+
+---
+
+### **19. Transaction History**
+
+#### **19.1 Overview**
+This endpoint provides transaction history for payments made through the platform. Only users with roles `ADMIN`, `MANAGER`, or `SUPERUSER` are authorized to access this endpoint.
+
+---
+
+### **Endpoint Details**
+
+#### **URL**: `/transactions/`
+#### **Method**: `GET`
+#### **Authentication**: Required (Bearer Token)
+#### **Authorization**: 
+- Accessible only to users with roles:
+  - `ADMIN`
+  - `MANAGER`
+  - `SUPERUSER`
+- Other roles (`EMPLOYEE`, `USER`, etc.) are not authorized.
+
+#### **Description**: 
+- Fetches all payment transactions, ordered by the most recent (`created_at` in descending order).
+- Includes detailed information about the associated booking.
+
+---
+
+### **Response Fields**
+
+| Field                | Type       | Description                              |
+|----------------------|------------|------------------------------------------|
+| `id`                 | Integer    | Unique ID of the payment record.         |
+| `booking_id`         | Integer    | ID of the associated booking.            |
+| `booking_info`       | Object     | Detailed information about the booking.  |
+| `razorpay_order_id`  | String     | Razorpay order ID for the payment.       |
+| `amount`             | Decimal    | Amount of the payment.                   |
+| `status`             | String     | Status of the payment (`PENDING`, `SUCCESS`, `FAILED`). |
+| `created_at`         | DateTime   | Timestamp of when the payment was created. |
+
+---
+
+### **Request Example**
+
+#### **GET**:
+```
+/transactions/
+```
+
+---
+
+### **Response Example**
+
+#### **Success Response**:
+- **Status**: `200 OK`
+
+```json
+[
+  {
+    "id": 1,
+    "booking_id": 101,
+    "booking_info": {
+      "full_name": "John Doe",
+      "email": "john.doe@example.com",
+      "phone_number": "+911234567890",
+      "address": "123 Main St, City",
+      "service_name": "General Pest Control",
+      "price": 12000
+    },
+    "razorpay_order_id": "order_123abc456",
+    "amount": 14472.00,
+    "status": "SUCCESS",
+    "created_at": "2025-05-01T10:00:00Z"
+  },
+  {
+    "id": 2,
+    "booking_id": 102,
+    "booking_info": {
+      "full_name": "Jane Smith",
+      "email": "jane.smith@example.com",
+      "phone_number": "+911234567891",
+      "address": "456 Elm St, City",
+      "service_name": "Honey Bees Control",
+      "price": 15000
+    },
+    "razorpay_order_id": "order_789xyz123",
+    "amount": 18090.00,
+    "status": "PENDING",
+    "created_at": "2025-05-02T14:00:00Z"
+  }
+]
+```
+
+#### **Forbidden Response**:
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "detail": "Not authorized."
+}
+```
+
+---
+
+### **19.2 Notes**
+
+- **Role-Based Access Control**:
+  - Only `ADMIN`, `MANAGER`, and `SUPERUSER` roles can access transaction history.
+  - Unauthorized roles will receive a `403 Forbidden` response.
+  
+- **Ordering**:
+  - Transactions are ordered by the `created_at` field in descending order, with the latest transactions appearing first.
+
+- **Booking Details**:
+  - The `booking_info` field provides detailed information about the associated booking, including the client's name, contact details, and service information.
+
+---
+
+### **20. Retrieve Active Offers**
+
+#### **20.1 Overview**
+This endpoint retrieves all active offers from the database and returns them as JSON. It is used to display active offers on the website.
+
+---
+
+### **Endpoint Details**
+
+#### **URL**: `/get_offers/`
+#### **Method**: `GET`
+#### **Authentication**: Not required.
+#### **Authorization**: Open to all users.
+#### **Description**: Fetches all offers with a status of `ACTIVE` (case-insensitive).
+
+---
+
+### **Response Fields**
+
+| Field             | Type       | Description                              |
+|-------------------|------------|------------------------------------------|
+| `id`              | Integer    | Unique ID of the offer.                  |
+| `title`           | String     | Title of the offer.                      |
+| `description`     | String     | Detailed description of the offer.       |
+| `price`           | Decimal    | Original price for the service.          |
+| `discount`        | Decimal    | Discount percentage.                     |
+| `discount_price`  | Decimal    | Price after applying the discount.       |
+| `start_date`      | Date       | Offer start date.                        |
+| `end_date`        | Date       | Offer end date.                          |
+| `status`          | String     | Status of the offer (`ACTIVE` or `EXPIRED`). |
+| `services`        | List       | List of services applicable to the offer. |
+| `offer_banner`    | URL        | URL to the offer banner image.           |
+
+---
+
+### **Request Example**
+
+#### **GET**:
+```
+/get_offers/
+```
+
+---
+
+### **Response Examples**
+
+#### **Success Response**:
+- **Status**: `200 OK`
+
+```json
+[
+  {
+    "id": 1,
+    "title": "Summer Discount",
+    "description": "Get 20% off on all pest control services.",
+    "price": 1000.00,
+    "discount": 20.00,
+    "discount_price": 800.00,
+    "start_date": "2025-05-01",
+    "end_date": "2025-05-31",
+    "status": "ACTIVE",
+    "services": ["General Pest Control", "Bed Bugs Control"],
+    "offer_banner": "http://example.com/media/offers/summer_discount.jpg"
+  },
+  {
+    "id": 2,
+    "title": "Monsoon Offer",
+    "description": "Special discounts for monsoon season.",
+    "price": 1500.00,
+    "discount": 25.00,
+    "discount_price": 1125.00,
+    "start_date": "2025-06-01",
+    "end_date": "2025-06-30",
+    "status": "ACTIVE",
+    "services": ["Anti Termite Treatment", "Rodent Pest Control"],
+    "offer_banner": "http://example.com/media/offers/monsoon_offer.jpg"
+  }
+]
+```
+
+---
+
+### **Notes**
+
+- **Filter Logic**:
+  - The endpoint filters offers with a status of `ACTIVE`, ensuring only currently available offers are shown.
+  - The `status` field is case-insensitive (`status__iexact`).
+
+- **Frontend Use**:
+  - This endpoint is designed for website integration to display active offers to clients.
+
+---
+
+### **21. Check Employee Availability**
+
+#### **21.1 Overview**
+This endpoint checks if employees are available at a given date and time. It is used during the booking or offer booking process, allowing the user to select an alternative date and time if the selected slot is unavailable.
+
+---
+
+### **Endpoint Details**
+
+#### **URL**: `/check-availability/`
+#### **Method**: `GET`
+#### **Authentication**: Not required.
+#### **Authorization**: Open to all users.
+#### **Description**: Checks whether employees are available at the specified date and time.
+
+---
+
+### **Request Parameters**
+
+| Parameter        | Type       | Required | Description                              |
+|------------------|------------|----------|------------------------------------------|
+| `booking_date`   | String     | Yes      | The desired booking date (format: `YYYY-MM-DD`). |
+| `booking_time`   | String     | Yes      | The desired booking time (format: `HH:MM`).       |
+
+---
+
+### **Response Fields**
+
+| Field             | Type       | Description                              |
+|-------------------|------------|------------------------------------------|
+| `available`       | Boolean    | Indicates if employees are available (`true` or `false`). |
+| `error`           | String     | Error message (only present if availability check fails). |
+
+---
+
+### **Request Examples**
+
+#### **Valid Request**:
+```
+/check-availability/?booking_date=2025-05-10&booking_time=14:00
+```
+
+#### **Invalid Request (Missing Parameters)**:
+```
+/check-availability/
+```
+
+---
+
+### **Response Examples**
+
+#### **1. Employees Available**:
+- **Status**: `200 OK`
+
+```json
+{
+  "available": true
+}
+```
+
+#### **2. Employees Unavailable**:
+- **Status**: `200 OK`
+
+```json
+{
+  "available": false
+}
+```
+
+#### **3. Missing Parameters**:
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "available": false,
+  "error": "Missing date or time"
+}
+```
+
+#### **4. Invalid Date/Time Format**:
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "available": false,
+  "error": "Invalid date/time format"
+}
+```
+
+#### **5. Past Time Selected**:
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "available": false,
+  "error": "Selected time has already passed"
+}
+```
+
+---
+
+### **21.2 Backend Workflow**
+
+1. **Input Validation**:
+   - Checks if both `booking_date` and `booking_time` are provided.
+   - Validates the format of the date and time.
+   - Ensures the selected time is not in the past.
+
+2. **Employee Availability Check**:
+   - Calculates the 2-hour window for the selected time (`booking_datetime` to `end_time`).
+   - Counts the total number of active employees.
+
+3. **Booking Overlap Check**:
+   - Identifies overlapping bookings in the 2-hour window.
+   - Calculates the total number of employees required for overlapping bookings.
+   - Verifies if the total employees required exceeds the available employees.
+
+4. **Assignment Overlap Check**:
+   - Identifies incomplete assignments overlapping with the selected time window.
+   - Verifies if the total overlapping assignments exceed the available employees.
+
+5. **Final Decision**:
+   - Returns `{"available": true}` if both the booking and assignment checks pass.
+   - Returns `{"available": false}` otherwise.
+
+---
+
+### **21.3 Notes**
+
+- **Use Case**:
+  - This endpoint is used on the website during the booking or offer booking process to help users select an available slot.
+  
+- **Error Handling**:
+  - Provides detailed error messages for invalid inputs or unavailable slots.
+
+### **22. Retrieve Latest Active Offer**
+
+#### **22.1 Overview**
+This endpoint retrieves the latest active offer to display on the website's main entry point. It is used for showing a popup with the most recent active offer.
+
+---
+
+### **Endpoint Details**
+
+#### **URL**: `/latest-offer/`
+#### **Method**: `GET`
+#### **Authentication**: Not required.
+#### **Authorization**: Open to all users.
+#### **Description**: Fetches the latest active offer based on its start and end dates. If no active offer exists, a response indicating no active offers is returned.
+
+---
+
+### **Response Fields**
+
+| Field             | Type       | Description                              |
+|-------------------|------------|------------------------------------------|
+| `id`              | Integer    | Unique ID of the offer.                  |
+| `title`           | String     | Title of the offer.                      |
+| `description`     | String     | Detailed description of the offer.       |
+| `price`           | Decimal    | Original price for the service.          |
+| `discount`        | Decimal    | Discount percentage.                     |
+| `discount_price`  | Decimal    | Price after applying the discount.       |
+| `start_date`      | Date       | Offer start date.                        |
+| `end_date`        | Date       | Offer end date.                          |
+| `status`          | String     | Status of the offer (`ACTIVE` or `EXPIRED`). |
+| `services`        | List       | List of services applicable to the offer. |
+| `offer_banner`    | URL        | URL to the offer banner image.           |
+
+---
+
+### **Request Example**
+
+#### **GET**:
+```
+/latest-offer/
+```
+
+---
+
+### **Response Examples**
+
+#### **1. Latest Active Offer Found**:
+- **Status**: `200 OK`
+
+```json
+{
+  "id": 1,
+  "title": "Spring Discount",
+  "description": "Get 15% off on all pest control services.",
+  "price": 1200.00,
+  "discount": 15.00,
+  "discount_price": 1020.00,
+  "start_date": "2025-05-01",
+  "end_date": "2025-05-10",
+  "status": "ACTIVE",
+  "services": ["Rodent Pest Control", "Anti Termite Treatment"],
+  "offer_banner": "http://example.com/media/offers/spring_discount.jpg"
+}
+```
+
+#### **2. No Active Offer**:
+- **Status**: `204 No Content`
+
+```json
+{
+  "detail": "No active offer."
+}
+```
+
+---
+
+### **22.2 Backend Workflow**
+
+1. **Filter Active Offers**:
+   - Filters offers with a status of `ACTIVE`.
+   - Ensures the current date (`now`) falls between the `start_date` and `end_date`.
+
+2. **Sorting**:
+   - Orders the filtered offers by `-start_date` (most recent first).
+
+3. **Retrieve Latest Offer**:
+   - Retrieves the first offer from the sorted list.
+   - If no active offers are found, a `204 No Content` response is returned.
+
+4. **Serialization**:
+   - If an offer is found, it is serialized and returned in the response.
+
+---
+
+### **22.3 Notes**
+
+- **Use Case**:
+  - This endpoint is specifically designed for the website's entry point to show a popup with the latest active offer.
+
+- **Performance**:
+  - The query is optimized to fetch only the latest active offer using sorting and filtering.
+
+
+### **23. Booking Count**
+
+#### **23.1 Overview**
+This endpoint provides a summary of booking counts categorized by their status. It is primarily used for dashboards or reporting purposes.
+
+---
+
+### **Endpoint Details**
+
+#### **URL**: `/booking-count/`
+#### **Method**: `GET`
+#### **Authentication**: Required (Bearer Token)
+#### **Authorization**: All authenticated users can access this endpoint.
+#### **Description**: Returns the total number of bookings and a breakdown of bookings by their status.
+
+---
+
+### **Response Fields**
+
+| Field                     | Type    | Description                                |
+|---------------------------|---------|--------------------------------------------|
+| `total_bookings`          | Integer | Total number of bookings in the system.    |
+| `pending_count`           | Integer | Number of bookings with the status `PENDING`. |
+| `service_completed_count` | Integer | Number of bookings with the status `SERVICE_COMPLETED`. |
+
+---
+
+### **Request Example**
+
+#### **GET**:
+```
+/booking-count/
+```
+
+---
+
+### **Response Example**
+
+#### **Success Response**:
+- **Status**: `200 OK`
+
+```json
+{
+  "total_bookings": 150,
+  "pending_count": 25,
+  "service_completed_count": 100
+}
+```
+
+#### **Error Response (Unauthorized)**:
+- **Status**: `401 Unauthorized`
+
+```json
+{
+  "detail": "Authentication credentials were not provided."
+}
+```
+
+---
+
+### **23.2 Backend Workflow**
+
+1. **Authentication**:
+   - Ensures the user is authenticated before processing the request.
+
+2. **Data Aggregation**:
+   - Counts all bookings in the system (`total_bookings`).
+   - Filters and counts bookings with:
+     - `status="PENDING"` (`pending_count`).
+     - `status="SERVICE_COMPLETED"` (`service_completed_count`).
+
+3. **Response**:
+   - Returns the aggregated counts in the response.
+
+---
+
+### **23.3 Notes**
+
+- **Use Case**:
+  - This endpoint is useful for admin dashboards to monitor booking statuses.
+  
+- **Performance**:
+  - Optimized queries are used to ensure efficient data retrieval.
+
+### **24. Booking Count by Date**
+
+#### **24.1 Overview**
+This endpoint provides a count of bookings based on a specific date or a date range. It is useful for viewing booking statistics for a specific day or period.
+
+---
+
+### **Endpoint Details**
+
+#### **URL**: `/booking-count-by-date/`
+#### **Method**: `GET`
+#### **Authentication**: Required (Bearer Token)
+#### **Authorization**: All authenticated users can access this endpoint.
+#### **Description**: Returns the total count of bookings based on a single date, a date range, or all bookings if no date is provided.
+
+---
+
+### **Request Parameters**
+
+| Parameter    | Type   | Required | Description                                |
+|--------------|--------|----------|--------------------------------------------|
+| `date`       | String | Optional | A specific date in `YYYY-MM-DD` format to get booking count for that day. |
+| `start_date` | String | Optional | Start date in `YYYY-MM-DD` format for the date range. Must be provided with `end_date`. |
+| `end_date`   | String | Optional | End date in `YYYY-MM-DD` format for the date range. Must be provided with `start_date`. |
+
+- If no parameters are provided, the endpoint returns the total count of all bookings.
+
+---
+
+### **Response Fields**
+
+| Field       | Type    | Description                           |
+|-------------|---------|---------------------------------------|
+| `count`     | Integer | The total count of bookings for the specified date, date range, or all bookings. |
+| `error`     | String  | Error message (only present if the request fails). |
+
+---
+
+### **Request Examples**
+
+#### **1. Count for a Single Date**:
+```
+/booking-count-by-date/?date=2025-05-01
+```
+
+#### **2. Count for a Date Range**:
+```
+/booking-count-by-date/?start_date=2025-05-01&end_date=2025-05-05
+```
+
+#### **3. Count for All Bookings**:
+```
+/booking-count-by-date/
+```
+
+---
+
+### **Response Examples**
+
+#### **1. Success Response (Single Date)**:
+- **Status**: `200 OK`
+
+```json
+{
+  "count": 15
+}
+```
+
+#### **2. Success Response (Date Range)**:
+- **Status**: `200 OK`
+
+```json
+{
+  "count": 50
+}
+```
+
+#### **3. Success Response (All Bookings)**:
+- **Status**: `200 OK`
+
+```json
+{
+  "count": 150
+}
+```
+
+#### **4. Error Response (Invalid Date Format)**:
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "error": "Invalid date format. Use YYYY-MM-DD."
+}
+```
+
+---
+
+### **24.2 Backend Workflow**
+
+1. **Input Validation**:
+   - Checks if `date`, `start_date`, or `end_date` parameters are provided.
+   - Validates the format of the date(s) (`YYYY-MM-DD`).
+
+2. **Query Logic**:
+   - If `date` is provided:
+     - Filters bookings created on the specified date.
+   - If `start_date` and `end_date` are provided:
+     - Filters bookings created within the specified date range (inclusive of the full `end_date` day).
+   - If no parameters are provided:
+     - Returns the total count of all bookings.
+
+3. **Response**:
+   - Returns the count of bookings based on the query.
+   - Returns an error message if the date format is invalid.
+
+---
+
+### **24.3 Notes**
+
+- **Use Case**:
+  - This endpoint is ideal for generating reports or monitoring booking trends for a specific day or period.
+  
+- **Error Handling**:
+  - Provides clear error messages for invalid date formats.
+### **25. Generate Booking Link**
+
+#### **25.1 Overview**
+This endpoint generates a unique booking link for a specific booking and sends it to the client's phone number via SMS. It is primarily used by the admin panel to share booking information with clients.
+
+---
+
+### **Endpoint Details**
+
+#### **URL**: `/generate-booking-link/`
+#### **Method**: `POST`
+#### **Authentication**: Required (Bearer Token)
+#### **Authorization**: Only authenticated users can access this endpoint.
+#### **Description**: Generates a secure booking link for a given booking ID and sends it to the client's registered phone number.
+
+---
+
+### **Request Body**
+
+| Field        | Type    | Required | Description                         |
+|--------------|---------|----------|-------------------------------------|
+| `booking_id` | Integer | Yes      | The ID of the booking for which the link is to be generated. |
+
+---
+
+### **Response Fields**
+
+| Field             | Type       | Description                                   |
+|-------------------|------------|-----------------------------------------------|
+| `booking_link`    | String     | The securely generated booking link.          |
+| `booking_details` | Object     | Serialized details of the booking.            |
+| `sms_sent`        | Boolean    | Indicates whether the SMS was successfully sent. |
+
+---
+
+### **Request Example**
+
+#### **POST**:
+```json
+{
+  "booking_id": 123
+}
+```
+
+---
+
+### **Response Examples**
+
+#### **1. Successful Response**:
+- **Status**: `200 OK`
+
+```json
+{
+  "booking_link": "https://www.superstarpestcontrol.com/booking-info/secure_token_123/",
+  "booking_details": {
+    "id": 123,
+    "full_name": "John Doe",
+    "phone_number": "+911234567890",
+    "email": "john.doe@example.com",
+    "service_name": "General Pest Control",
+    "booking_date": "2025-05-10",
+    "booking_time": "14:00:00",
+    "price": 1200.00
+  },
+  "sms_sent": true
+}
+```
+
+#### **2. Missing Booking ID**:
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "error": "Booking ID is required"
+}
+```
+
+#### **3. Invalid Booking ID**:
+- **Status**: `404 Not Found`
+
+```json
+{
+  "detail": "Not found."
+}
+```
+
+---
+
+### **25.2 Backend Workflow**
+
+1. **Input Validation**:
+   - Ensures the `booking_id` is provided in the request body.
+
+2. **Retrieve Booking**:
+   - Retrieves the booking from the database using the provided `booking_id`.
+   - Returns a `404 Not Found` response if the booking doesn't exist.
+
+3. **Generate Booking Link**:
+   - Creates a secure booking link using the booking's `secure_token`.
+
+4. **Send SMS**:
+   - Sends the booking link to the client's registered phone number using the `send_booking_link` function.
+   - Updates the `booking_link_sent` field in the booking record to indicate the link has been sent.
+
+5. **Serialize and Respond**:
+   - Serializes the updated booking details.
+   - Returns the generated booking link, booking details, and the SMS status in the response.
+
+---
+
+### **25.3 Notes**
+
+- **Secure Booking Link**:
+  - The booking link includes a `secure_token` for security purposes, preventing unauthorized access.
+
+- **SMS Integration**:
+  - The `send_booking_link` function is assumed to handle the SMS sending process and return the SMS status.
+
+- **Use Case**:
+  - This endpoint is designed for admin panel users to share booking details with clients via SMS.
+
+### **26. Update Price and Generate Payment Link**
+
+#### **26.1 Overview**
+This endpoint allows authorized users (Admin, Manager, or Superuser) to update the booking price, calculate additional charges (GST, payment gateway charges), and generate a secure payment link. The generated payment link is then sent to the client's phone number via SMS.
+
+---
+
+### **Endpoint Details**
+
+#### **URL**: `/update-price-and-generate-link/`
+#### **Method**: `POST`
+#### **Authentication**: Required (Bearer Token)
+#### **Authorization**: 
+- Only accessible by users with roles:
+  - `ADMIN`
+  - `MANAGER`
+  - `SUPERUSER`
+
+#### **Description**: Updates the booking price, calculates the total cost (including GST and payment gateway charges), generates a payment link, and sends the link via SMS to the client.
+
+---
+
+### **Request Body**
+
+| Field        | Type    | Required | Description                                                |
+|--------------|---------|----------|------------------------------------------------------------|
+| `booking_id` | Integer | Yes      | The ID of the booking for which the price is to be updated. |
+| `price`      | Float   | Yes      | The new price to update for the booking.                   |
+
+---
+
+### **Response Fields**
+
+| Field                       | Type     | Description                                               |
+|-----------------------------|----------|-----------------------------------------------------------|
+| `message`                   | String   | Success message.                                          |
+| `booking_id`                | Integer  | The ID of the updated booking.                           |
+| `price`                     | Float    | The updated price of the booking.                        |
+| `gst`                       | Float    | The calculated GST (18% of the price).                   |
+| `payment_gateway_charges`   | Float    | The calculated payment gateway fee (2.6% of the price).  |
+| `grand_total`               | Float    | The total cost (price + GST + payment gateway charges).   |
+| `payment_link`              | String   | The generated secure payment link.                       |
+| `sms_sent`                  | Boolean  | Whether the SMS was successfully sent.                   |
+
+---
+
+### **Request Example**
+
+#### **POST**:
+```json
+{
+  "booking_id": 123,
+  "price": 1500.00
+}
+```
+
+---
+
+### **Response Examples**
+
+#### **1. Success Response**:
+- **Status**: `200 OK`
+
+```json
+{
+  "message": "Price updated successfully and payment link generated.",
+  "booking_id": 123,
+  "price": 1500.0,
+  "gst": 270.0,
+  "payment_gateway_charges": 39.0,
+  "grand_total": 1809.0,
+  "payment_link": "https://www.superstarpestcontrol.com/booking-info/secure_token_123/",
+  "sms_sent": true
+}
+```
+
+#### **2. Missing Required Fields**:
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "error": "Booking ID and price are required."
+}
+```
+
+#### **3. Unauthorized Access**:
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "error": "Unauthorized"
+}
+```
+
+#### **4. Invalid Booking ID**:
+- **Status**: `404 Not Found`
+
+```json
+{
+  "detail": "Not found."
+}
+```
+
+#### **5. Other Errors**:
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "error": "An unexpected error occurred."
+}
+```
+
+---
+
+### **26.2 Backend Workflow**
+
+1. **Input Validation**:
+   - Ensures both `booking_id` and `price` are provided in the request.
+   - Returns an error if either field is missing.
+
+2. **Authorization Check**:
+   - Verifies the user's role is one of `ADMIN`, `MANAGER`, or `SUPERUSER`.
+   - Returns a `403 Forbidden` error for unauthorized users.
+
+3. **Retrieve Booking**:
+   - Fetches the booking record using the provided `booking_id`.
+   - Returns a `404 Not Found` error if the booking doesn't exist.
+
+4. **Price Update and Calculations**:
+   - Updates the booking's `price` field.
+   - Calculates:
+     - GST (18% of the price).
+     - Payment gateway charges (2.6% of the price).
+     - Grand total (`price + GST + payment gateway charges`).
+   - Saves the updated booking with all calculations.
+
+5. **Generate Payment Link**:
+   - Creates a secure payment link using the booking's `secure_token`.
+
+6. **Send SMS**:
+   - Sends the payment link to the client's registered phone number using the `send_payment_link_sms` function.
+   - Updates the `booking_link_sent` field to indicate the link was sent.
+
+7. **Response**:
+   - Returns the updated booking details, payment link, and SMS status.
+
+---
+
+### **26.3 Notes**
+
+- **Secure Payment Link**:
+  - The link includes a `secure_token` for security purposes, ensuring only the client can access it.
+
+- **SMS Integration**:
+  - The `send_payment_link_sms` function handles the SMS sending process and returns the status.
+
+- **Use Case**:
+  - This endpoint is designed for admin panel users to update booking prices and share payment links with clients.
+
+
+
