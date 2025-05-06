@@ -1,4 +1,4 @@
-<div align="center">
+<div style="text-align: center;">
   <img src="https://developguardindia.com/static/img/logo.png" alt="Company Logo" width="150">
   
   # **Develop Guard India Pvt. Ltd**
@@ -7,7 +7,7 @@
 </div>
 
 
-<div align="center">
+<div style="text-align: center;">
 
 | **Field**             | **Details**                    |
 |-----------------------|--------------------------------|
@@ -496,7 +496,6 @@ The website is fully responsive, ensuring compatibility across all devices:
 
 This frontend documentation provides a detailed overview of the structure, components, and features implemented to ensure a user-friendly and visually appealing experience.
 
----
 
 # 🖥️ Backend Documentation
 
