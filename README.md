@@ -3835,5 +3835,1012 @@ This endpoint allows authorized users (Admin, Manager, or Superuser) to update t
 - **Use Case**:
   - This endpoint is designed for admin panel users to update booking prices and share payment links with clients.
 
+### **28. Support Panel Messaging System**
+
+#### **28.1 Overview**
+This messaging system is a support panel feature for the admin panel. It allows authenticated users with specific roles (`ADMIN`, `MANAGER`, `SUPERUSER`) to send and receive messages. Role-based permissions ensure that users can only message authorized roles.
+
+---
+
+### **Endpoints**
+
+| **Endpoint**                  | **Method** | **Description**                                   | **Authentication** | **Authorization** |
+|--------------------------------|------------|---------------------------------------------------|---------------------|--------------------|
+| `/messages/send/`              | `POST`     | Send a message to another user.                  | Required            | Role-based         |
+| `/messages/inbox/`             | `GET`      | Retrieve a list of received messages (inbox).    | Required            | All authenticated users. |
+| `/messages/sent/`              | `GET`      | Retrieve a list of sent messages.                | Required            | All authenticated users. |
+
+---
+
+### **28.2 Message Sending**
+
+#### **URL**: `/messages/send/`
+#### **Method**: `POST`
+#### **Authentication**: Required (Bearer Token)
+#### **Authorization**: Role-based messaging permissions.
+
+#### **Request Body**
+
+| Field       | Type    | Required | Description                                 |
+|-------------|---------|----------|---------------------------------------------|
+| `receiver`  | Integer | Yes      | The ID of the user to whom the message is being sent. |
+| `message`   | String  | Yes      | The message text.                           |
+
+#### **Response Fields**
+
+| Field         | Type    | Description                                   |
+|---------------|---------|-----------------------------------------------|
+| `id`          | Integer | Unique ID of the message.                    |
+| `sender`      | Integer | ID of the sender.                            |
+| `sender_name` | String  | Name of the sender.                          |
+| `sender_role` | String  | Role of the sender.                          |
+| `receiver`    | Integer | ID of the receiver.                          |
+| `receiver_name` | String | Name of the receiver.                       |
+| `receiver_role` | String | Role of the receiver.                       |
+| `message`     | String  | The message text.                            |
+| `timestamp`   | String  | The time the message was sent.               |
+
+---
+
+#### **Request Example**
+
+```json
+{
+  "receiver": 5,
+  "message": "Hello, how can I assist you?"
+}
+```
+
+#### **Success Response**
+- **Status**: `201 Created`
+
+```json
+{
+  "id": 12,
+  "sender": 3,
+  "sender_name": "John Doe",
+  "sender_role": "ADMIN",
+  "receiver": 5,
+  "receiver_name": "Jane Smith",
+  "receiver_role": "MANAGER",
+  "message": "Hello, how can I assist you?",
+  "timestamp": "2025-05-06T07:20:00Z"
+}
+```
+
+#### **Error: Receiver Not Found**
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "error": "Receiver not found"
+}
+```
+
+#### **Error: Unauthorized Role**
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "error": "You do not have permission to message this user"
+}
+```
+
+#### **Role-Based Messaging Rules**
+| **Sender Role** | **Allowed Receiver Roles** |
+|------------------|----------------------------|
+| `ADMIN`          | `MANAGER`, `SUPERUSER`     |
+| `MANAGER`        | `ADMIN`, `SUPERUSER`       |
+| `SUPERUSER`      | `ADMIN`, `MANAGER`         |
+
+---
+
+### **28.3 Inbox**
+
+#### **URL**: `/messages/inbox/`
+#### **Method**: `GET`
+#### **Authentication**: Required (Bearer Token)
+#### **Authorization**: All authenticated users.
+
+#### **Response Fields**
+
+| Field         | Type    | Description                                   |
+|---------------|---------|-----------------------------------------------|
+| `id`          | Integer | Unique ID of the message.                    |
+| `sender`      | Integer | ID of the sender.                            |
+| `sender_name` | String  | Name of the sender.                          |
+| `sender_role` | String  | Role of the sender.                          |
+| `receiver`    | Integer | ID of the receiver.                          |
+| `receiver_name` | String | Name of the receiver.                       |
+| `receiver_role` | String | Role of the receiver.                       |
+| `message`     | String  | The message text.                            |
+| `timestamp`   | String  | The time the message was sent.               |
+
+---
+
+#### **Request Example**
+
+```
+/messages/inbox/
+```
+
+#### **Success Response**
+- **Status**: `200 OK`
+
+```json
+[
+  {
+    "id": 12,
+    "sender": 3,
+    "sender_name": "John Doe",
+    "sender_role": "ADMIN",
+    "receiver": 5,
+    "receiver_name": "Jane Smith",
+    "receiver_role": "MANAGER",
+    "message": "Hello, how can I assist you?",
+    "timestamp": "2025-05-06T07:20:00Z"
+  },
+  {
+    "id": 15,
+    "sender": 4,
+    "sender_name": "Alex Brown",
+    "sender_role": "SUPERUSER",
+    "receiver": 5,
+    "receiver_name": "Jane Smith",
+    "receiver_role": "MANAGER",
+    "message": "Please update the report.",
+    "timestamp": "2025-05-05T12:45:00Z"
+  }
+]
+```
+
+---
+
+### **28.4 Sent Messages**
+
+#### **URL**: `/messages/sent/`
+#### **Method**: `GET`
+#### **Authentication**: Required (Bearer Token)
+#### **Authorization**: All authenticated users.
+
+#### **Response Fields**
+
+| Field         | Type    | Description                                   |
+|---------------|---------|-----------------------------------------------|
+| `id`          | Integer | Unique ID of the message.                    |
+| `sender`      | Integer | ID of the sender.                            |
+| `sender_name` | String  | Name of the sender.                          |
+| `sender_role` | String  | Role of the sender.                          |
+| `receiver`    | Integer | ID of the receiver.                          |
+| `receiver_name` | String | Name of the receiver.                       |
+| `receiver_role` | String | Role of the receiver.                       |
+| `message`     | String  | The message text.                            |
+| `timestamp`   | String  | The time the message was sent.               |
+
+---
+
+#### **Request Example**
+
+```
+/messages/sent/
+```
+
+#### **Success Response**
+- **Status**: `200 OK`
+
+```json
+[
+  {
+    "id": 20,
+    "sender": 5,
+    "sender_name": "Jane Smith",
+    "sender_role": "MANAGER",
+    "receiver": 3,
+    "receiver_name": "John Doe",
+    "receiver_role": "ADMIN",
+    "message": "I have sent the updated report.",
+    "timestamp": "2025-05-05T14:30:00Z"
+  }
+]
+```
+
+---
+
+### **28.5 Notes**
+
+- **Role-Based Messaging**:
+  - Only users with permitted roles can send messages to other roles.
+  - Unauthorized attempts will result in a `403 Forbidden` error.
+
+- **Inbox and Sent Messages**:
+  - Messages in the inbox are ordered by the most recent (`timestamp` descending).
+  - Sent messages are similarly ordered.
+
+---
+### **29. Submit Contact Form**
+
+#### **29.1 Overview**
+This endpoint allows users to submit their contact information and a message via the website's contact form. The submitted details are saved to the database and an email notification is sent to the website owner.
+
+---
+
+### **Endpoint Details**
+
+#### **URL**: `/submit-contact/`
+#### **Method**: `POST`
+#### **Authentication**: Not required.
+#### **Authorization**: Open to all users.
+#### **Description**: Submits a contact form and sends the details to the website owner.
+
+---
+
+### **Request Body**
+
+| Field       | Type    | Required | Description                                    |
+|-------------|---------|----------|------------------------------------------------|
+| `name`      | String  | Yes      | The name of the person submitting the form.    |
+| `email`     | String  | Yes      | The email address of the person.               |
+| `mobile`    | String  | Yes      | The mobile number of the person.               |
+| `message`   | String  | Yes      | The message or query submitted by the person.  |
+
+---
+
+### **Response Fields**
+
+| Field       | Type    | Description                                   |
+|-------------|---------|-----------------------------------------------|
+| `status`    | String  | The status of the submission (`success` or `error`). |
+| `message`   | String  | A message indicating the result of the submission.   |
+
+---
+
+### **Request Example**
+
+#### **POST**:
+```json
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "mobile": "+911234567890",
+  "message": "I need help with booking services."
+}
+```
+
+---
+
+### **Response Examples**
+
+#### **1. Successful Submission**:
+- **Status**: `200 OK`
+
+```json
+{
+  "status": "success",
+  "message": "Message sent successfully!"
+}
+```
+
+#### **2. Invalid Request (Wrong Method)**:
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "status": "error",
+  "message": "Invalid request"
+}
+```
+
+---
+
+### **29.2 Backend Workflow**
+
+1. **Request Validation**:
+   - Ensures the request method is `POST`.
+   - Retrieves the `name`, `email`, `mobile`, and `message` fields from the request body.
+
+2. **Save to Database**:
+   - Creates a new record in the `ContactForm` model with the submitted details.
+
+3. **Send Email Notification**:
+   - Sends the submitted contact form details to the website owner using the `send_contact_form_to_owner` function.
+
+4. **Response**:
+   - Returns a success message if the form is submitted successfully.
+   - Returns an error message for invalid requests.
+
+---
+
+### **29.3 Notes**
+
+- **CSRF Protection**:
+  - The endpoint is protected against Cross-Site Request Forgery (CSRF) attacks using the `@csrf_protect` decorator.
+
+- **Use Case**:
+  - This endpoint is designed for the website's contact form to collect user inquiries or feedback.
+
+### **30. Contact Form Management**
+
+#### **30.1 Overview**
+This set of endpoints provides functionalities to view and manage contact form submissions. Only authorized roles (`SUPERUSER`, `ADMIN`, `MANAGER`) can access these endpoints.
+
+---
+
+### **Endpoints**
+
+| **Endpoint**                     | **Method** | **Description**                               | **Authentication** | **Authorization**                 |
+|-----------------------------------|------------|-----------------------------------------------|---------------------|------------------------------------|
+| `/contact/`                       | `GET`      | Retrieve all contact form submissions.        | Required            | `SUPERUSER`, `ADMIN`, `MANAGER`   |
+| `/contact/<int:id>/`              | `GET`      | Retrieve a specific contact form submission.  | Required            | `SUPERUSER`, `ADMIN`, `MANAGER`   |
+| `/contact/<int:id>/`              | `DELETE`   | Delete a specific contact form submission.    | Required            | `SUPERUSER`, `ADMIN`, `MANAGER`   |
+
+---
+
+### **30.2 Retrieve All Contact Messages**
+
+#### **URL**: `/contact/`
+#### **Method**: `GET`
+#### **Authentication**: Required (Bearer Token)
+#### **Authorization**: Only `SUPERUSER`, `ADMIN`, and `MANAGER`.
+
+#### **Response Fields**
+
+| Field       | Type    | Description                                   |
+|-------------|---------|-----------------------------------------------|
+| `id`        | Integer | Unique ID of the contact form submission.    |
+| `name`      | String  | Name of the person who submitted the form.   |
+| `email`     | String  | Email address of the person.                 |
+| `mobile`    | String  | Mobile number of the person.                 |
+| `message`   | String  | The message submitted by the person.         |
+| `created_at`| String  | Timestamp when the contact form was created. |
+
+---
+
+#### **Request Example**
+
+```
+/contact/
+```
+
+#### **Success Response**
+- **Status**: `200 OK`
+
+```json
+[
+  {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "mobile": "+911234567890",
+    "message": "I need help with booking services.",
+    "created_at": "2025-05-05T14:30:00Z"
+  },
+  {
+    "id": 2,
+    "name": "Jane Smith",
+    "email": "jane.smith@example.com",
+    "mobile": "+919876543210",
+    "message": "Can you provide a quote?",
+    "created_at": "2025-05-06T07:00:00Z"
+  }
+]
+```
+
+#### **Error: Unauthorized Role**
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "error": "Access Denied"
+}
+```
+
+---
+
+### **30.3 Retrieve a Specific Contact Message**
+
+#### **URL**: `/contact/<int:id>/`
+#### **Method**: `GET`
+#### **Authentication**: Required (Bearer Token)
+#### **Authorization**: Only `SUPERUSER`, `ADMIN`, and `MANAGER`.
+
+#### **Response Fields**
+
+| Field       | Type    | Description                                   |
+|-------------|---------|-----------------------------------------------|
+| `id`        | Integer | Unique ID of the contact form submission.    |
+| `name`      | String  | Name of the person who submitted the form.   |
+| `email`     | String  | Email address of the person.                 |
+| `mobile`    | String  | Mobile number of the person.                 |
+| `message`   | String  | The message submitted by the person.         |
+| `created_at`| String  | Timestamp when the contact form was created. |
+
+---
+
+#### **Request Example**
+
+```
+/contact/1/
+```
+
+#### **Success Response**
+- **Status**: `200 OK`
+
+```json
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "mobile": "+911234567890",
+  "message": "I need help with booking services.",
+  "created_at": "2025-05-05T14:30:00Z"
+}
+```
+
+#### **Error: Unauthorized Role**
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "error": "Access Denied"
+}
+```
+
+---
+
+### **30.4 Delete a Specific Contact Message**
+
+#### **URL**: `/contact/<int:id>/`
+#### **Method**: `DELETE`
+#### **Authentication**: Required (Bearer Token)
+#### **Authorization**: Only `SUPERUSER`, `ADMIN`, and `MANAGER`.
+
+#### **Response Fields**
+
+| Field       | Type    | Description                                   |
+|-------------|---------|-----------------------------------------------|
+| `message`   | String  | Success message indicating the deletion.     |
+
+---
+
+#### **Request Example**
+
+```
+DELETE /contact/1/
+```
+
+#### **Success Response**
+- **Status**: `200 OK`
+
+```json
+{
+  "message": "Contact deleted successfully"
+}
+```
+
+#### **Error: Unauthorized Role**
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "error": "Access Denied"
+}
+```
+
+---
+
+### **30.5 Notes**
+
+- **Role-Based Access**:
+  - Only users with roles `SUPERUSER`, `ADMIN`, and `MANAGER` can access these endpoints.
+  - Unauthorized users will receive a `403 Forbidden` error.
+
+- **Pagination**:
+  - The `/contact/` endpoint supports pagination if the number of contact messages is large.
+
+### **31. Submit Feedback**
+
+#### **31.1 Overview**
+This endpoint allows users to submit feedback via the website. The feedback is saved to the database, and an email notification is sent to the website owner.
+
+---
+
+### **Endpoint Details**
+
+#### **URL**: `/submit-feedback/`
+#### **Method**: `POST`
+#### **Authentication**: Not required.
+#### **Authorization**: Open to all users.
+#### **Description**: Submits feedback and sends the details to the website owner.
+
+---
+
+### **Request Body**
+
+| Field       | Type    | Required | Description                                    |
+|-------------|---------|----------|------------------------------------------------|
+| `name`      | String  | Yes      | The name of the person submitting the feedback. |
+| `email`     | String  | Yes      | The email address of the person.               |
+| `message`   | String  | Yes      | The feedback message provided by the user.     |
+
+---
+
+### **Response Fields**
+
+| Field       | Type    | Description                                   |
+|-------------|---------|-----------------------------------------------|
+| `status`    | String  | The status of the submission (`success` or `error`). |
+| `message`   | String  | A message indicating the result of the submission.   |
+
+---
+
+### **Request Example**
+
+#### **POST**:
+```json
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "message": "I love the service provided by your team!"
+}
+```
+
+---
+
+### **Response Examples**
+
+#### **1. Successful Submission**:
+- **Status**: `200 OK`
+
+```json
+{
+  "status": "success",
+  "message": "Feedback submitted successfully!"
+}
+```
+
+#### **2. Invalid Request (Wrong Method)**:
+- **Status**: `400 Bad Request`
+
+```json
+{
+  "status": "error",
+  "message": "Invalid request"
+}
+```
+
+---
+
+### **31.2 Backend Workflow**
+
+1. **Request Validation**:
+   - Ensures the request method is `POST`.
+   - Retrieves the `name`, `email`, and `message` fields from the request body.
+
+2. **Save Feedback**:
+   - Creates a new record in the `Feedback` model with the submitted details.
+
+3. **Send Email Notification**:
+   - Sends the submitted feedback details to the website owner using the `send_feedback_to_owner` function.
+
+4. **Response**:
+   - Returns a success message if the feedback is submitted successfully.
+   - Returns an error message for invalid requests.
+
+---
+
+### **31.3 Notes**
+
+- **CSRF Protection**:
+  - The endpoint is protected against Cross-Site Request Forgery (CSRF) attacks using the `@csrf_protect` decorator.
+
+- **Use Case**:
+  - This endpoint is designed for the website's feedback form to collect user feedback.
+
+### **32. Feedback Management**
+
+#### **32.1 Overview**
+This set of endpoints provides functionalities to view and manage feedback submissions. Only authorized roles (`SUPERUSER`, `ADMIN`, `MANAGER`) can access these endpoints.
+
+---
+
+### **Endpoints**
+
+| **Endpoint**                     | **Method** | **Description**                               | **Authentication** | **Authorization**                 |
+|-----------------------------------|------------|-----------------------------------------------|---------------------|------------------------------------|
+| `/feedback/`                      | `GET`      | Retrieve all feedback messages.               | Required            | `SUPERUSER`, `ADMIN`, `MANAGER`   |
+| `/feedback/<int:id>/`             | `GET`      | Retrieve a specific feedback message.         | Required            | `SUPERUSER`, `ADMIN`, `MANAGER`   |
+| `/feedback/<int:id>/`             | `DELETE`   | Delete a specific feedback message.           | Required            | `SUPERUSER`, `ADMIN`, `MANAGER`   |
+
+---
+
+### **32.2 Retrieve All Feedback Messages**
+
+#### **URL**: `/feedback/`
+#### **Method**: `GET`
+#### **Authentication**: Required (Bearer Token)
+#### **Authorization**: Only `SUPERUSER`, `ADMIN`, and `MANAGER`.
+
+#### **Response Fields**
+
+| Field       | Type    | Description                                   |
+|-------------|---------|-----------------------------------------------|
+| `id`        | Integer | Unique ID of the feedback submission.        |
+| `name`      | String  | Name of the person who submitted the feedback. |
+| `email`     | String  | Email address of the person.                 |
+| `message`   | String  | The feedback message provided by the user.   |
+| `created_at`| String  | Timestamp when the feedback was submitted.   |
+
+---
+
+#### **Request Example**
+
+```
+/feedback/
+```
+
+#### **Success Response**
+- **Status**: `200 OK`
+
+```json
+[
+  {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "message": "Great service, keep it up!",
+    "created_at": "2025-05-05T14:30:00Z"
+  },
+  {
+    "id": 2,
+    "name": "Jane Smith",
+    "email": "jane.smith@example.com",
+    "message": "I have some suggestions for improvement.",
+    "created_at": "2025-05-06T07:00:00Z"
+  }
+]
+```
+
+#### **Error: Unauthorized Role**
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "error": "Access Denied"
+}
+```
+
+---
+
+### **32.3 Retrieve a Specific Feedback Message**
+
+#### **URL**: `/feedback/<int:id>/`
+#### **Method**: `GET`
+#### **Authentication**: Required (Bearer Token)
+#### **Authorization**: Only `SUPERUSER`, `ADMIN`, and `MANAGER`.
+
+#### **Response Fields**
+
+| Field       | Type    | Description                                   |
+|-------------|---------|-----------------------------------------------|
+| `id`        | Integer | Unique ID of the feedback submission.        |
+| `name`      | String  | Name of the person who submitted the feedback. |
+| `email`     | String  | Email address of the person.                 |
+| `message`   | String  | The feedback message provided by the user.   |
+| `created_at`| String  | Timestamp when the feedback was submitted.   |
+
+---
+
+#### **Request Example**
+
+```
+/feedback/1/
+```
+
+#### **Success Response**
+- **Status**: `200 OK`
+
+```json
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "message": "Great service, keep it up!",
+  "created_at": "2025-05-05T14:30:00Z"
+}
+```
+
+#### **Error: Unauthorized Role**
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "error": "Access Denied"
+}
+```
+
+---
+
+### **32.4 Delete a Specific Feedback Message**
+
+#### **URL**: `/feedback/<int:id>/`
+#### **Method**: `DELETE`
+#### **Authentication**: Required (Bearer Token)
+#### **Authorization**: Only `SUPERUSER`, `ADMIN`, and `MANAGER`.
+
+#### **Response Fields**
+
+| Field       | Type    | Description                                   |
+|-------------|---------|-----------------------------------------------|
+| `message`   | String  | Success message indicating the deletion.     |
+
+---
+
+#### **Request Example**
+
+```
+DELETE /feedback/1/
+```
+
+#### **Success Response**
+- **Status**: `200 OK`
+
+```json
+{
+  "message": "Feedback deleted successfully"
+}
+```
+
+#### **Error: Unauthorized Role**
+- **Status**: `403 Forbidden`
+
+```json
+{
+  "error": "Access Denied"
+}
+```
+
+---
+
+### **32.5 Notes**
+
+- **Role-Based Access**:
+  - Only users with roles `SUPERUSER`, `ADMIN`, and `MANAGER` can access these endpoints.
+  - Unauthorized users will receive a `403 Forbidden` error.
+
+- **Pagination**:
+  - The `/feedback/` endpoint supports pagination if the number of feedback messages is large.
+
+
+### **33. Assignment Management**
+
+#### **33.1 Overview**
+This part of the admin panel allows authorized users (`ADMIN`, `MANAGER`, and `SUPERUSER`) to assign employees to specific bookings for inspections or work. Assignments ensure time windows are respected and no overlapping assignments exist for employees.
+
+---
+
+### **Endpoints**
+
+| **Endpoint**                     | **Method** | **Description**                               | **Authentication** | **Authorization**                 |
+|-----------------------------------|------------|-----------------------------------------------|---------------------|------------------------------------|
+| `/assignments/`                   | `POST`     | Create a new assignment.                      | Required            | `SUPERUSER`, `ADMIN`, `MANAGER`   |
+| `/assignments/`                   | `GET`      | Retrieve a list of all assignments.           | Required            | `SUPERUSER`, `ADMIN`, `MANAGER`   |
+| `/assignments/<int:id>/`          | `PATCH`    | Update an existing assignment.                | Required            | `SUPERUSER`, `ADMIN`, `MANAGER`   |
+| `/assignments/<int:id>/`          | `DELETE`   | Delete an assignment.                         | Required            | `SUPERUSER`, `ADMIN`, `MANAGER`   |
+
+---
+
+### **33.2 Create an Assignment**
+
+#### **URL**: `/assignments/`
+#### **Method**: `POST`
+#### **Authentication**: Required (Bearer Token)
+#### **Authorization**: Only `SUPERUSER`, `ADMIN`, and `MANAGER`.
+
+#### **Request Body**
+
+| Field              | Type    | Required | Description                                    |
+|--------------------|---------|----------|------------------------------------------------|
+| `booking`          | Integer | Yes      | The ID of the booking for the assignment.     |
+| `employee`         | Integer | Yes      | The ID of the employee to be assigned.        |
+| `assignment_type`  | String  | Yes      | The type of assignment (`INSPECTION` or `WORK`). |
+| `duration_hours`   | Integer | No       | Duration of the assignment (default: 2 hours).|
+
+#### **Response Fields**
+
+| Field              | Type    | Description                                    |
+|--------------------|---------|------------------------------------------------|
+| `id`               | Integer | Unique ID of the assignment.                  |
+| `booking`          | Integer | ID of the assigned booking.                   |
+| `employee`         | Integer | ID of the assigned employee.                  |
+| `assignment_type`  | String  | The assignment type.                          |
+| `start_time`       | String  | Assignment start time.                        |
+| `end_time`         | String  | Assignment end time.                          |
+| `is_completed`     | Boolean | Whether the assignment has been completed.    |
+
+---
+
+#### **Request Example**
+
+```json
+{
+  "booking": 12,
+  "employee": 5,
+  "assignment_type": "INSPECTION",
+  "duration_hours": 2
+}
+```
+
+#### **Success Response**
+- **Status**: `201 Created`
+
+```json
+{
+  "id": 45,
+  "booking": 12,
+  "employee": 5,
+  "assignment_type": "INSPECTION",
+  "start_time": "2025-05-10T09:00:00Z",
+  "end_time": "2025-05-10T11:00:00Z",
+  "is_completed": false
+}
+```
+
+#### **Error Responses**
+
+- **Selected Time Passed**:
+  - **Status**: `400 Bad Request`
+  ```json
+  {
+    "success": false,
+    "message": "Selected time has already passed."
+  }
+  ```
+
+- **Overlapping Assignment**:
+  - **Status**: `400 Bad Request`
+  ```json
+  {
+    "success": false,
+    "message": "Employee is already assigned during this time window."
+  }
+  ```
+
+- **Invalid Assignment Type**:
+  - **Status**: `400 Bad Request`
+  ```json
+  {
+    "success": false,
+    "message": "Inspection can only be assigned when booking is pending."
+  }
+  ```
+
+---
+
+### **33.3 Update an Assignment**
+
+#### **URL**: `/assignments/<int:id>/`
+#### **Method**: `PATCH`
+#### **Authentication**: Required (Bearer Token)
+#### **Authorization**: Only `SUPERUSER`, `ADMIN`, and `MANAGER`.
+
+#### **Request Body**
+
+| Field              | Type    | Required | Description                                    |
+|--------------------|---------|----------|------------------------------------------------|
+| `employee`         | Integer | No       | The new employee ID for the assignment.       |
+| `start_time`       | String  | No       | The new start time for the assignment (ISO format). |
+| `end_time`         | String  | No       | The new end time for the assignment (ISO format). |
+| `is_completed`     | Boolean | No       | Mark the assignment as completed.             |
+
+#### **Response Fields**
+
+| Field              | Type    | Description                                    |
+|--------------------|---------|------------------------------------------------|
+| `id`               | Integer | Unique ID of the assignment.                  |
+| `booking`          | Integer | ID of the assigned booking.                   |
+| `employee`         | Integer | ID of the assigned employee.                  |
+| `assignment_type`  | String  | The assignment type.                          |
+| `start_time`       | String  | Assignment start time.                        |
+| `end_time`         | String  | Assignment end time.                          |
+| `is_completed`     | Boolean | Whether the assignment has been completed.    |
+
+---
+
+#### **Request Example**
+
+```json
+{
+  "employee": 7,
+  "start_time": "2025-05-10T09:00:00Z",
+  "end_time": "2025-05-10T11:00:00Z",
+  "is_completed": true
+}
+```
+
+#### **Success Response**
+- **Status**: `200 OK`
+
+```json
+{
+  "id": 45,
+  "booking": 12,
+  "employee": 7,
+  "assignment_type": "WORK",
+  "start_time": "2025-05-10T09:00:00Z",
+  "end_time": "2025-05-10T11:00:00Z",
+  "is_completed": true
+}
+```
+
+#### **Error Responses**
+
+- **Start Time in the Past**:
+  - **Status**: `400 Bad Request`
+  ```json
+  {
+    "success": false,
+    "message": "Start time is in the past."
+  }
+  ```
+
+- **Overlapping Assignment**:
+  - **Status**: `400 Bad Request`
+  ```json
+  {
+    "success": false,
+    "message": "Employee is already assigned during this time."
+  }
+  ```
+
+---
+
+### **33.4 Delete an Assignment**
+
+#### **URL**: `/assignments/<int:id>/`
+#### **Method**: `DELETE`
+#### **Authentication**: Required (Bearer Token)
+#### **Authorization**: Only `SUPERUSER`, `ADMIN`, and `MANAGER`.
+
+#### **Response Fields**
+
+| Field              | Type    | Description                                    |
+|--------------------|---------|------------------------------------------------|
+| `message`          | String  | Success message indicating the deletion.       |
+
+---
+
+#### **Request Example**
+
+```
+DELETE /assignments/45/
+```
+
+#### **Success Response**
+- **Status**: `200 OK`
+
+```json
+{
+  "message": "Assignment deleted successfully."
+}
+```
+
+---
+
+### **33.5 Notes**
+
+- **Role-Based Authorization**:
+  - Only users with roles `SUPERUSER`, `ADMIN`, and `MANAGER` are allowed to perform assignment actions.
+
+- **Assignment Rules**:
+  - **INSPECTION**: Can only be assigned when the booking is in the `PENDING` status.
+  - **WORK**: Can only be assigned after the inspection is completed (`INSPECTION_COMPLETED`).
+
+- **Time Validation**:
+  - Ensures no overlapping assignments exist for the selected employee.
+
+- **Notifications**:
+  - Notifications are sent to employees and clients upon assignment creation or completion.
+
+
 
 
