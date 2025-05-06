@@ -6515,7 +6515,7 @@ Thank you for being part of the **Superstar Pest Control** journey!
 ### 📌 Footer
 
 For more information, help, or to report any issues:
-- **Support Email**: support@superstarpestcontrol.com  
+- **Support Email**: support@beginningsolutions.in  / contact@beginningsolutions.in
 - **GitHub Repository**: [BSS02 Project](https://github.com/Beginning-co-in/BSS02)  
 - **Documentation Maintainer**: Beginning Solutions (https://beginningsolutions.in)
 
